@@ -26,7 +26,7 @@ Example lambda.json file:
   "name": "myFunction",
   "description": "It does things",
   "region": "us-east-1",
-  "handler": function.lambda_handler",
+  "handler": "function.lambda_handler",
   "role": "arn:aws:iam::00000000000:role/lambda_basic_execution",
   "requirements": ["pygithub"],
   "timeout": 30,
