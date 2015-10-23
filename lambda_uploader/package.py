@@ -33,7 +33,7 @@ def cleanup(path):
         os.remove(zip_file)
 
 
-def build_package(path, requirements=None):
+def build_package(path, requirements):
     temp_workspace = os.path.join(path, TEMP_WORKSPACE_NAME)
     # Calling cleanup first to cover a previous failed run
     cleanup(path)
@@ -51,7 +51,7 @@ def build_package(path, requirements=None):
         raise Exception('virtualenv returned unsuccessfully')
 
     cmd = None
-    if requirements is not None:
+    if not requirements:
         LOG.debug("Installing requirements found %s in config" % requirements)
         cmd = [os.path.join(pkg_venv, 'bin/pip'),
                'install', " ".join(requirements)]

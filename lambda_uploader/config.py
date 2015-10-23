@@ -19,7 +19,7 @@ REQUIRED_PARAMS = {'name': basestring, 'description': basestring,
                    'region': basestring, 'handler': basestring,
                    'role': basestring, 'timeout': int, 'memory': int}
 
-DEFAULT_PARAMS = {'requirements': None, 'publish': False}
+DEFAULT_PARAMS = {u'requirements': [], u'publish': False}
 
 
 class Config(object):
