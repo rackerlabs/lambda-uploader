@@ -51,7 +51,7 @@ def build_package(path, requirements):
         raise Exception('virtualenv returned unsuccessfully')
 
     cmd = None
-    if not requirements:
+    if requirements:
         LOG.debug("Installing requirements found %s in config" % requirements)
         cmd = [os.path.join(pkg_venv, 'bin/pip'),
                'install', " ".join(requirements)]
