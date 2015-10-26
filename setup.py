@@ -6,6 +6,7 @@ from setuptools import setup, find_packages
 
 DEPENDENCIES = [
     'boto3==1.1.4',
+    'virtualenv',
 ]
 
 TESTS_REQUIRE = []
