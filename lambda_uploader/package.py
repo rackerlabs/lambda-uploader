@@ -16,6 +16,7 @@ import os
 import shutil
 import zipfile
 import logging
+import sys
 
 from subprocess import Popen, PIPE
 
@@ -53,13 +54,13 @@ def build_package(path, requirements):
     cmd = None
     if requirements:
         LOG.debug("Installing requirements found %s in config" % requirements)
-        cmd = [os.path.join(pkg_venv, 'bin/pip'),
+        cmd = [os.path.join(pkg_venv, _venv_pip()),
                'install', " ".join(requirements)]
 
     elif os.path.isfile("requirements.txt"):
         # Pip install
         LOG.debug("Installing requirements from requirements.txt file")
-        cmd = [os.path.join(pkg_venv, 'bin/pip'),
+        cmd = [os.path.join(pkg_venv, _venv_pip()),
                "install", "-r", "requirements.txt"]
 
     if cmd is not None:
@@ -74,10 +75,22 @@ def build_package(path, requirements):
 
     # Copy site packages into package base
     LOG.info('Copying site packages')
-    shutil.copytree(os.path.join(pkg_venv, 'lib/python2.7/site-packages'),
+
+    site_packages = 'lib/python2.7/site-packages'
+    if sys.platform == 'win32' or sys.platform == 'cygwin':
+        site_packages = 'lib\\site-packages'
+
+    shutil.copytree(os.path.join(pkg_venv, site_packages),
                     package)
     _copy_src_files(path, package)
     _create_zip(package, path)
+
+
+def _venv_pip():
+    if sys.platform == 'win32' or sys.platform == 'cygwin':
+        return 'Scripts\pip.exe'
+    else:
+        return 'bin/pip'
 
 
 def _copy_src_files(src, package):
