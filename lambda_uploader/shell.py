@@ -28,27 +28,36 @@ from lambda_uploader import package, config, uploader
 LOG = logging.getLogger(__name__)
 
 NAMESPACE = 'rax_jira'
-EXCLAIM = '\xe2\x9d\x97\xef\xb8\x8f'
 CHECK = '\xe2\x9c\x85'
-PIZZA = '\xf0\x9f\x8d\x95'
 INTERROBANG = '\xe2\x81\x89\xef\xb8\x8f'
 RED_X = '\xe2\x9d\x8c'
+LAMBDA = '\xce\xbb'
+
+
+# Used for stdout for shell
+def _print(txt):
+    # Windows Powershell doesn't support Unicode
+    if sys.platform == 'win32' or sys.platform == 'cygwin':
+        print(txt)
+    else:
+        # Add the lambda symbol
+        print("%s %s" % (LAMBDA, txt))
 
 
 def _execute(args):
     pth = path.abspath(args.function_dir)
 
     cfg = config.Config(pth)
-    print("%s Building Package %s" % (PIZZA, PIZZA))
+    _print('Building Package')
     package.build_package(pth, cfg.requirements)
     if not args.no_upload:
-        print("%s Uploading Package %s" % (PIZZA, PIZZA))
+        _print('Uploading Package')
         uploader.upload_package(pth, cfg)
 
     if not args.no_clean:
         package.cleanup(pth)
 
-    print("%s Fin %s" % (PIZZA, PIZZA))
+    _print('Fin')
 
 
 def main(arv=None):
