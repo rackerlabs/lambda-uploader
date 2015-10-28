@@ -13,7 +13,7 @@
 # limitations under the License.
 
 __title__ = 'lambda_uploader'
-__version__ = '0.0.2'
+__version__ = '0.1.0'
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright Rackspace US, Inc. 2015'
 __url__ = 'https://github.com/rackerlabs/lambda-uploader'
