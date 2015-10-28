@@ -35,12 +35,14 @@ Example lambda.json file:
 ```
 
 ### Command Line Usage
-To package and upload simply 
+To package and upload simply run the command from within your lambda directory or
+with the directory as an option.
 ```shell
 lambda-uploader ./myfunc
 ```
 
-If you would prefer to upload another way you can tell the uploader to ignore that step.
+If you would prefer to upload another way you can tell the uploader to ignore the upload.
+This will create a package and leave it in the project directory.
 ```shell
 lambda-uploader --no-upload ./myfunc
 ```
