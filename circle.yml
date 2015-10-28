@@ -2,10 +2,6 @@ machine:
   python:
     version: 2.7
 
-dependencies:
-  post:
-    - rm -r ~/virtualenvs
-
 test:
   pre:
     - pip install -r test-requirements.txt
