@@ -15,15 +15,11 @@
 import boto3
 import logging
 
-from os import path
-from lambda_uploader import package
-
 LOG = logging.getLogger(__name__)
 
 
-def upload_package(function_dir, config):
-    zfile = path.join(function_dir, package.ZIPFILE_NAME)
-    with open(zfile, "rb") as fil:
+def upload_package(pkg, config):
+    with open(pkg.zip_file, "rb") as fil:
         zip_file = fil.read()
 
     client = boto3.client('lambda', region_name=config.region)

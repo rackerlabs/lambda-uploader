@@ -49,13 +49,15 @@ def _execute(args):
 
     cfg = config.Config(pth)
     _print('Building Package')
-    package.build_package(pth, cfg.requirements)
-    if not args.no_upload:
-        _print('Uploading Package')
-        uploader.upload_package(pth, cfg)
+    pkg = package.build_package(pth, cfg.requirements)
 
     if not args.no_clean:
-        package.cleanup(pth)
+        pkg.clean_workspace()
+
+    if not args.no_upload:
+        _print('Uploading Package')
+        uploader.upload_package(pkg, cfg)
+        pkg.clean_zipfile()
 
     _print('Fin')
 
@@ -74,7 +76,7 @@ def main(arv=None):
 
     parser.add_argument('--no-clean', dest='no_clean',
                         action='store_const',
-                        help='dont cleanup any files after uploading',
+                        help='dont cleanup the temporary workspace',
                         const=True)
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
                         help='lambda function directory')
