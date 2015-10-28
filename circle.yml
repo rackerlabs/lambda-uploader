@@ -11,3 +11,4 @@ test:
     - pip install -r test-requirements.txt
   override:
     - flake8 .
+    - py.test
