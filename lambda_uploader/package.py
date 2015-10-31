@@ -19,6 +19,7 @@ import logging
 import sys
 
 from subprocess import Popen, PIPE
+from lambda_uploader import utils
 
 LOG = logging.getLogger(__name__)
 TEMP_WORKSPACE_NAME = ".lambda_package"
@@ -102,27 +103,8 @@ class Package(object):
 
         shutil.copytree(os.path.join(self._pkg_venv, site_packages),
                         package)
-        self._copy_src_files(package)
+        utils.copy_tree(self._path, package, ignore=[TEMP_WORKSPACE_NAME])
         self._create_zip(package)
-
-    def _copy_src_files(self, package):
-        LOG.info('Copying source files')
-        # Re-create cwd directory structure
-        for root, subdirs, files in os.walk(self._path):
-            for subdir in subdirs:
-                subdir_path = os.path.join(root, subdir)
-                if TEMP_WORKSPACE_NAME in subdir_path:
-                    continue
-                fpath = os.path.join(package, subdir)
-                LOG.debug("Creating directory %s" % fpath)
-                os.mkdir(fpath)
-
-            for filename in files:
-                path = os.path.join(root, filename)
-                if TEMP_WORKSPACE_NAME in path:
-                    continue
-
-                shutil.copy(path, package)
 
     def _create_zip(self, src):
         zfile = os.path.join(self._path, ZIPFILE_NAME)
