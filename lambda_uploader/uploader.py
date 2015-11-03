@@ -65,4 +65,3 @@ def upload_package(pkg, config):
             Publish=config.publish,
         )
         LOG.debug("AWS create_function response: %s" % response)
-
