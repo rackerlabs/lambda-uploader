@@ -33,7 +33,6 @@ def upload_package(pkg, config):
         existing_function = False
         LOG.debug("function not found creating new function")
 
-    response = ''
     if existing_function:
         LOG.debug('running update_function_code')
         response = client.update_function_code(
@@ -41,6 +40,17 @@ def upload_package(pkg, config):
             ZipFile=zip_file,
             Publish=config.publish,
         )
+        LOG.debug("AWS update_function_code response: %s" % response)
+        LOG.debug('running update_function_configuration')
+        response = client.update_function_configuration(
+            FunctionName=config.name,
+            Handler=config.handler,
+            Role=config.role,
+            Description=config.description,
+            Timeout=config.timeout,
+            MemorySize=config.memory,
+        )
+        LOG.debug("AWS update_function_configuration response: %s" % response)
     else:
         LOG.debug('running create_function_code')
         response = client.create_function(
@@ -54,5 +64,5 @@ def upload_package(pkg, config):
             MemorySize=config.memory,
             Publish=config.publish,
         )
+        LOG.debug("AWS create_function response: %s" % response)
 
-    LOG.debug("AWS create_function response: %s" % response)
