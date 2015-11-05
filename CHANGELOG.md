@@ -4,6 +4,7 @@ lambda-uploader CHANGELOG
 Unreleased
 ----------
 - Added support for updating the lambda configuration
+- Added a publish flag to the cli
 
 0.1.1
 -----
