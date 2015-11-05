@@ -39,6 +39,9 @@ class Config(object):
 
         return self._config
 
+    def set_publish(self):
+        self._config['publish'] = True
+
     def _set_defaults(self):
         for param, val in DEFAULT_PARAMS.iteritems():
             if self._config.get(param) is None:

@@ -48,6 +48,10 @@ def _execute(args):
     pth = path.abspath(args.function_dir)
 
     cfg = config.Config(pth)
+    # Set publish if flagged to do so
+    if args.publish:
+        cfg.set_publish()
+
     _print('Building Package')
     pkg = package.build_package(pth, cfg.requirements)
 
@@ -77,6 +81,10 @@ def main(arv=None):
     parser.add_argument('--no-clean', dest='no_clean',
                         action='store_const',
                         help='dont cleanup the temporary workspace',
+                        const=True)
+    parser.add_argument('--publish', '-p', dest='publish',
+                        action='store_const',
+                        help='publish an upload to an immutable version',
                         const=True)
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
                         help='lambda function directory')
