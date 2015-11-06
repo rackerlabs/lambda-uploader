@@ -41,6 +41,12 @@ with the directory as an option.
 lambda-uploader ./myfunc
 ```
 
+To specify an alternative profile that has been defined in `~/.aws/credentials` use the
+`--profile` parameter.
+```shell
+lambda-uploader --profile=alternative-profile
+```
+
 If you would prefer to upload another way you can tell the uploader to ignore the upload.
 This will create a package and leave it in the project directory.
 ```shell

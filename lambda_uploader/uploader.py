@@ -18,11 +18,13 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-def upload_package(pkg, config):
+def upload_package(pkg, config, profile_name):
     with open(pkg.zip_file, "rb") as fil:
         zip_file = fil.read()
 
-    client = boto3.client('lambda', region_name=config.region)
+    session = boto3.session.Session(region_name=config.region,
+                                    profile_name=profile_name)
+    client = session.client('lambda')
     # Assume the function already exists in AWS
     existing_function = True
 
