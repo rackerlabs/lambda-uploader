@@ -60,7 +60,7 @@ def _execute(args):
 
     if not args.no_upload:
         _print('Uploading Package')
-        uploader.upload_package(pkg, cfg)
+        uploader.upload_package(pkg, cfg, args.profile)
         pkg.clean_zipfile()
 
     _print('Fin')
@@ -86,6 +86,8 @@ def main(arv=None):
                         action='store_const',
                         help='publish an upload to an immutable version',
                         const=True)
+    parser.add_argument('--profile', dest='profile',
+                        help='specify AWS cli profile')
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
                         help='lambda function directory')
 
