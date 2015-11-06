@@ -75,7 +75,7 @@ class Package(object):
             LOG.debug("Installing requirements found %s in config"
                       % requirements)
             cmd = [os.path.join(self._pkg_venv, self._venv_pip),
-                   'install', " ".join(requirements)]
+                   'install'] + requirements
 
         elif os.path.isfile("requirements.txt"):
             # Pip install
