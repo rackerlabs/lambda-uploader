@@ -48,9 +48,6 @@ def _execute(args):
     pth = path.abspath(args.function_dir)
 
     cfg = config.Config(pth)
-    # Set publish if flagged to do so
-    if args.publish:
-        cfg.set_publish()
 
     _print('Building Package')
     pkg = package.build_package(pth, cfg.requirements)
@@ -59,8 +56,23 @@ def _execute(args):
         pkg.clean_workspace()
 
     if not args.no_upload:
+        # Set publish if flagged to do so
+        if args.publish:
+            cfg.set_publish()
+
+        create_alias = False
+        # Set alias if the arg is passed
+        if args.alias is not None:
+            cfg.set_alias(args.alias, args.alias_description)
+            create_alias = True
+
         _print('Uploading Package')
-        uploader.upload_package(pkg, cfg, args.profile)
+        upldr = uploader.PackageUploader(cfg, args.profile)
+        upldr.upload(pkg)
+        # If the alias was set create it
+        if create_alias:
+            upldr.alias()
+
         pkg.clean_zipfile()
 
     _print('Fin')
@@ -88,6 +100,11 @@ def main(arv=None):
                         const=True)
     parser.add_argument('--profile', dest='profile',
                         help='specify AWS cli profile')
+    alias_help = 'alias for published version (WILL SET THE PUBLISH FLAG)'
+    parser.add_argument('--alias', '-a', dest='alias',
+                        default=None, help=alias_help)
+    parser.add_argument('--alias-description', '-m', dest='alias_description',
+                        default=None, help='alias description')
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
                         help='lambda function directory')
 

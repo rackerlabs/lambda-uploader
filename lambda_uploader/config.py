@@ -19,7 +19,8 @@ REQUIRED_PARAMS = {'name': basestring, 'description': basestring,
                    'region': basestring, 'handler': basestring,
                    'role': basestring, 'timeout': int, 'memory': int}
 
-DEFAULT_PARAMS = {u'requirements': [], u'publish': False}
+DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
+                  u'alias': None, u'alias_description': None}
 
 
 class Config(object):
@@ -32,6 +33,9 @@ class Config(object):
         for param, clss in REQUIRED_PARAMS.iteritems():
             self._validate(param, cls=clss)
 
+    '''
+    Return raw config
+    '''
     @property
     def raw(self):
         if not self._config:
@@ -39,14 +43,34 @@ class Config(object):
 
         return self._config
 
+    '''
+    Return an alias description if set otherwise return an the function
+    description
+    '''
+    @property
+    def alias_description(self):
+        if self._config['alias_description'] is None:
+            return self._config['description']
+        else:
+            return self._config['alias_description']
+
+    '''Set the publish attr to true'''
     def set_publish(self):
         self._config['publish'] = True
 
+    '''Set the alias and description'''
+    def set_alias(self, alias, description=None):
+        self._config['alias'] = alias
+        self._config['alias_description'] = description
+        self._config['publish'] = True
+
+    '''Set all defaults after loading the config'''
     def _set_defaults(self):
         for param, val in DEFAULT_PARAMS.iteritems():
             if self._config.get(param) is None:
                 self._config[param] = val
 
+    '''Validate the configuration file'''
     def _validate(self, key, cls=None):
         if key not in self._config:
             raise ValueError("Config %s must have %s set"
@@ -56,6 +80,7 @@ class Config(object):
                     raise TypeError("Config value '%s' should be %s not %s"
                                     % (key, cls, type(self._config[key])))
 
+    '''Load config ... called by init()'''
     def _load_config(self):
         config_file = path.join(self._path, 'lambda.json')
         if not path.isfile(config_file):
