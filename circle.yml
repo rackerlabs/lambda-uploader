@@ -1,3 +1,7 @@
+dependencies:
+  pre:
+    - rm -r ~/virtualenvs
+
 machine:
   python:
     version: 2.7
@@ -5,6 +9,7 @@ machine:
 test:
   pre:
     - pip install -r test-requirements.txt
+    - python setup.py develop
   override:
     - flake8 .
     - py.test
