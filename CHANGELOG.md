@@ -1,6 +1,10 @@
 lambda-uploader CHANGELOG
 =========================
 
+0.2.1
+-----
+- Bumped version to deal with pypi failing
+
 0.2.0
 -----
 - Added support for updating the lambda configuration
