@@ -56,6 +56,13 @@ directory or with the directory as an option.
 
     lambda-uploader ./myfunc
 
+To specify an alternative profile that has been defined in
+``~/.aws/credentials`` use the ``--profile`` parameter.
+
+.. code:: shell
+
+    lambda-uploader --profile=alternative-profile
+
 If you would prefer to upload another way you can tell the uploader to
 ignore the upload. This will create a package and leave it in the
 project directory.
@@ -63,3 +70,18 @@ project directory.
 .. code:: shell
 
     lambda-uploader --no-upload ./myfunc
+
+To publish a version without an alias you would pass the the publish
+flag.
+
+.. code:: shell
+
+    lambda-uploader -p ./myfunc
+
+If you would like to alias your upload you can pass the alias with the
+alias flag. The function description will be used when an
+alias-description is not provided.
+
+.. code:: shell
+
+    lambda-uploader --alias myAlias --alias-description 'My alias description' ./myfunc

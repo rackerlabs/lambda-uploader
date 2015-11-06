@@ -52,3 +52,14 @@ This will create a package and leave it in the project directory.
 ```shell
 lambda-uploader --no-upload ./myfunc
 ```
+
+To publish a version without an alias you would pass the the publish flag.
+```shell
+lambda-uploader -p ./myfunc
+```
+
+If you would like to alias your upload you can pass the alias with the alias flag. The
+function description will be used when an alias-description is not provided.
+```shell
+lambda-uploader --alias myAlias --alias-description 'My alias description' ./myfunc
+```
