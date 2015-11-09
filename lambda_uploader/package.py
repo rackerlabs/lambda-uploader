@@ -103,6 +103,16 @@ class Package(object):
 
         shutil.copytree(os.path.join(self._pkg_venv, site_packages),
                         package)
+        
+        lib64_site_packages = 'lib64/python2.7/site-packages'
+        if sys.platform == 'win32' or sys.platform == 'cygwin':
+            lib64_site_packages = 'lib64\\site-packages'
+
+        lib64_site_packages = os.path.join(self._pkg_venv, lib64_site_packages)
+        if os.path.exists(lib64_site_packages):
+		    utils.copy_tree(os.path.join(self._pkg_venv, lib64_site_packages),
+					package)
+        
         utils.copy_tree(self._path, package, ignore=[TEMP_WORKSPACE_NAME])
         self._create_zip(package)
 
