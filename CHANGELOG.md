@@ -1,6 +1,11 @@
 lambda-uploader CHANGELOG
 =========================
 
+0.2.2
+-----
+- Fixed issue with multiple requirements set in the config causing
+  an error
+
 0.2.1
 -----
 - Bumped version to deal with pypi failing
