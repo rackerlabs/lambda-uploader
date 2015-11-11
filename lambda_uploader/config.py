@@ -24,10 +24,10 @@ DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
 
 
 class Config(object):
-    def __init__(self, pth):
+    def __init__(self, pth, config_file=None):
         self._path = pth
         self._config = None
-        self._load_config()
+        self._load_config(config_file)
         self._set_defaults()
 
         for param, clss in REQUIRED_PARAMS.iteritems():
@@ -81,12 +81,14 @@ class Config(object):
                                     % (key, cls, type(self._config[key])))
 
     '''Load config ... called by init()'''
-    def _load_config(self):
-        config_file = path.join(self._path, 'lambda.json')
-        if not path.isfile(config_file):
-            raise Exception("lambda.json not found")
+    def _load_config(self, lambda_file=None):
+        if not lambda_file:
+            lambda_file = path.join(self._path, 'lambda.json')
 
-        with open(config_file) as config_file:
+        if not path.isfile(lambda_file):
+            raise Exception("%s not found" % lambda_file)
+
+        with open(lambda_file) as config_file:
             self._config = json.load(config_file)
 
     def __getattr__(self, key):
