@@ -47,7 +47,7 @@ def _print(txt):
 def _execute(args):
     pth = path.abspath(args.function_dir)
 
-    cfg = config.Config(pth)
+    cfg = config.Config(pth, args.config)
 
     _print('Building Package')
     pkg = package.build_package(pth, cfg.requirements)
@@ -89,7 +89,6 @@ def main(arv=None):
     parser.add_argument('--no-upload', dest='no_upload',
                         action='store_const', help='dont upload the zipfile',
                         const=True)
-
     parser.add_argument('--no-clean', dest='no_clean',
                         action='store_const',
                         help='dont cleanup the temporary workspace',
@@ -105,6 +104,8 @@ def main(arv=None):
                         default=None, help=alias_help)
     parser.add_argument('--alias-description', '-m', dest='alias_description',
                         default=None, help='alias description')
+    parser.add_argument('--config', help='Overrides lambda.json',
+                        default=None)
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
                         help='lambda function directory')
 
