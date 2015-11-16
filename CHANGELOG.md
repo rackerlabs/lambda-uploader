@@ -1,6 +1,12 @@
 lambda-uploader CHANGELOG
 =========================
 
+0.3.0
+-----
+- Added flag to allow specifying the lambda.json path
+- Added a role flag and environment variable to use in lieu of setting
+  it in the config
+
 0.2.2
 -----
 - Fixed issue with multiple requirements set in the config causing
