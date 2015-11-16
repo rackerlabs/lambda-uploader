@@ -17,6 +17,13 @@ def test_load_config():
         assert cfg.raw[key] == val
 
 
+def test_role_override():
+    role = 'arn:aws:iam::00000000000:role/myfunc_role'
+    cfg = config.Config(EX_CONFIG, role=role)
+
+    assert cfg.role is role
+
+
 def test_set_publish():
     cfg = config.Config(EX_CONFIG)
     # Check that we default to false
