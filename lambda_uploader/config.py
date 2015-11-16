@@ -24,10 +24,12 @@ DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
 
 
 class Config(object):
-    def __init__(self, pth, config_file=None):
+    def __init__(self, pth, config_file=None, role=None):
         self._path = pth
         self._config = None
         self._load_config(config_file)
+        if role is not None:
+            self._config['role'] = role
         self._set_defaults()
 
         for param, clss in REQUIRED_PARAMS.iteritems():

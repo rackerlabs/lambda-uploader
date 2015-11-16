@@ -22,7 +22,7 @@ import logging
 import traceback
 import lambda_uploader
 
-from os import getcwd, path
+from os import getcwd, path, getenv
 from lambda_uploader import package, config, uploader
 
 LOG = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def _print(txt):
 def _execute(args):
     pth = path.abspath(args.function_dir)
 
-    cfg = config.Config(pth, args.config)
+    cfg = config.Config(pth, args.config, role=args.role)
 
     _print('Building Package')
     pkg = package.build_package(pth, cfg.requirements)
@@ -97,6 +97,10 @@ def main(arv=None):
                         action='store_const',
                         help='publish an upload to an immutable version',
                         const=True)
+    parser.add_argument('--role', dest='role',
+                        default=getenv('LAMBDA_UPLOADER_ROLE'),
+                        help=('IAM role to assign the lambda function, '
+                              'can be set with $LAMBDA_UPLOADER_ROLE'))
     parser.add_argument('--profile', dest='profile',
                         help='specify AWS cli profile')
     alias_help = 'alias for published version (WILL SET THE PUBLISH FLAG)'
