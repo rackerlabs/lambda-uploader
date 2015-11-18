@@ -26,28 +26,38 @@ TEMP_WORKSPACE_NAME = ".lamba_uploader_temp"
 ZIPFILE_NAME = 'lambda_function.zip'
 
 
-def build_package(path, requirements):
-    pkg = Package(path)
+def build_package(path, requirements, virtualenv=None):
+    pkg = Package(path, virtualenv)
 
     pkg.clean_workspace()
     pkg.clean_zipfile()
     pkg.prepare_workspace()
-    pkg.install_requirements(requirements)
+    if virtualenv:
+        if not os.path.isdir(virtualenv):
+            raise Exception("supplied virtualenv %s not found" % virtualenv)
+        LOG.info("Using existing virtualenv found in %s" % virtualenv)
+    else:
+        LOG.info('Building new virtualenv and installing requirements')
+        pkg.prepare_virtualenv()
+        pkg.install_requirements(requirements)
     pkg.package()
     return pkg
 
 
 class Package(object):
-    def __init__(self, path):
+    def __init__(self, path, virtualenv=None):
         self._path = path
         self._temp_workspace = os.path.join(path,
                                             TEMP_WORKSPACE_NAME)
         self.zip_file = os.path.join(path, ZIPFILE_NAME)
 
-        self._pkg_venv = os.path.join(self._temp_workspace, 'venv')
-        self._venv_pip = 'bin/pip'
-        if sys.platform == 'win32' or sys.platform == 'cygwin':
-            self._venv_pip = 'Scripts\pip.exe'
+        if virtualenv:
+            self._pkg_venv = virtualenv
+        else:
+            self._pkg_venv = os.path.join(self._temp_workspace, 'venv')
+            self._venv_pip = 'bin/pip'
+            if sys.platform == 'win32' or sys.platform == 'cygwin':
+                self._venv_pip = 'Scripts\pip.exe'
 
     def clean_workspace(self):
         if os.path.isdir(self._temp_workspace):
@@ -61,6 +71,7 @@ class Package(object):
         # Setup temporary workspace
         os.mkdir(self._temp_workspace)
 
+    def prepare_virtualenv(self):
         proc = Popen(["virtualenv", self._pkg_venv], stdout=PIPE, stderr=PIPE)
         stdout, stderr = proc.communicate()
         LOG.debug("Virtualenv stdout: %s" % stdout)

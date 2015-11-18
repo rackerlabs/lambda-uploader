@@ -47,6 +47,11 @@ To specify an alternative profile that has been defined in `~/.aws/credentials` 
 lambda-uploader --profile=alternative-profile
 ```
 
+To specify an alternative, prexisting virtualenv use the `--virtualenv` parameter.
+```shell
+lambda-uploader --virtualenv=~/.virtualenv/my_custom_virtualenv
+```
+
 If you would prefer to upload another way you can tell the uploader to ignore the upload.
 This will create a package and leave it in the project directory.
 ```shell
