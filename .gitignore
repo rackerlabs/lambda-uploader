@@ -53,5 +53,5 @@ docs/_build/
 # PyBuilder
 target/
 
-.lambda_package
+.lambda_uploader_temp
 *.zip

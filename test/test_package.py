@@ -25,7 +25,7 @@ def test_package_zip_location():
 
 def test_package_clean_workspace():
     temp_workspace = path.join(TESTING_TEMP_DIR,
-                               '.lambda_package')
+                               package.TEMP_WORKSPACE_NAME)
     os.mkdir(temp_workspace)
 
     pkg = package.Package(TESTING_TEMP_DIR)
@@ -35,7 +35,7 @@ def test_package_clean_workspace():
 
 def test_prepare_workspace():
     temp_workspace = path.join(TESTING_TEMP_DIR,
-                               '.lambda_package')
+                               package.TEMP_WORKSPACE_NAME)
 
     pkg = package.Package(TESTING_TEMP_DIR)
     pkg.prepare_workspace()
@@ -50,7 +50,7 @@ def test_prepare_workspace():
 def test_install_requirements():
     reqs = ['pytest']
     temp_workspace = path.join(TESTING_TEMP_DIR,
-                               '.lambda_package')
+                               package.TEMP_WORKSPACE_NAME)
 
     pkg = package.Package(TESTING_TEMP_DIR)
     # pkg.prepare_workspace()
