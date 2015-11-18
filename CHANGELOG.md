@@ -1,6 +1,14 @@
 lambda-uploader CHANGELOG
 =========================
 
+Unreleased
+----------
+- Added support for ignoring files
+- Added the ability to use an existing virtual environment
+- Fixed the temporary workspace name to prevent confusion
+- Updated the virtualenv site-packages copy to include lib64 if it
+  is not a symlink
+
 0.3.0
 -----
 - Added flag to allow specifying the lambda.json path
