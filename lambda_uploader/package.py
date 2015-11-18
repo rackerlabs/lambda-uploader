@@ -26,7 +26,7 @@ TEMP_WORKSPACE_NAME = ".lamba_uploader_temp"
 ZIPFILE_NAME = 'lambda_function.zip'
 
 
-def build_package(path, requirements, virtualenv=None):
+def build_package(path, requirements, virtualenv=None, ignore=[]):
     pkg = Package(path, virtualenv)
 
     pkg.clean_workspace()
@@ -40,7 +40,7 @@ def build_package(path, requirements, virtualenv=None):
         LOG.info('Building new virtualenv and installing requirements')
         pkg.prepare_virtualenv()
         pkg.install_requirements(requirements)
-    pkg.package()
+    pkg.package(ignore)
     return pkg
 
 
@@ -103,7 +103,7 @@ class Package(object):
             if prc.returncode is not 0:
                 raise Exception('pip returned unsuccessfully')
 
-    def package(self):
+    def package(self, ignore=[]):
         package = os.path.join(self._temp_workspace, 'lambda_package')
 
         # Copy site packages into package base
@@ -122,7 +122,9 @@ class Package(object):
             LOG.info('Copying lib64 site packages')
             utils.copy_tree(lib64_path, package)
 
-        utils.copy_tree(self._path, package, ignore=[TEMP_WORKSPACE_NAME])
+        # Append the temp workspace to the ignore list
+        ignore.append("^%s/*" % self._temp_workspace)
+        utils.copy_tree(self._path, package, ignore)
         self._create_zip(package)
 
     def _create_zip(self, src):

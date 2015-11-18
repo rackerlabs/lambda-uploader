@@ -15,12 +15,13 @@
 import json
 from os import path
 
-REQUIRED_PARAMS = {'name': basestring, 'description': basestring,
-                   'region': basestring, 'handler': basestring,
-                   'role': basestring, 'timeout': int, 'memory': int}
+REQUIRED_PARAMS = {u'name': basestring, u'description': basestring,
+                   u'region': basestring, u'handler': basestring,
+                   u'role': basestring, u'timeout': int, u'memory': int}
 
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
-                  u'alias': None, u'alias_description': None}
+                  u'alias': None, u'alias_description': None,
+                  u'ignore': []}
 
 
 class Config(object):

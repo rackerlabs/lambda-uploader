@@ -50,7 +50,8 @@ def _execute(args):
     cfg = config.Config(pth, args.config, role=args.role)
 
     _print('Building Package')
-    pkg = package.build_package(pth, cfg.requirements, args.virtualenv)
+    pkg = package.build_package(pth, cfg.requirements,
+                                args.virtualenv, cfg.ignore)
 
     if not args.no_clean:
         pkg.clean_workspace()
