@@ -97,12 +97,20 @@ class Package(object):
 
         # Copy site packages into package base
         LOG.info('Copying site packages')
+
         site_packages = 'lib/python2.7/site-packages'
+        lib64_site_packages = 'lib64/python2.7/site-packages'
         if sys.platform == 'win32' or sys.platform == 'cygwin':
+            lib64_site_packages = 'lib64\\site-packages'
             site_packages = 'lib\\site-packages'
 
-        shutil.copytree(os.path.join(self._pkg_venv, site_packages),
+        utils.copy_tree(os.path.join(self._pkg_venv, site_packages),
                         package)
+        lib64_path = os.path.join(self._pkg_venv, lib64_site_packages)
+        if not os.path.islink(lib64_path):
+            LOG.info('Copying lib64 site packages')
+            utils.copy_tree(lib64_path, package)
+
         utils.copy_tree(self._path, package, ignore=[TEMP_WORKSPACE_NAME])
         self._create_zip(package)
 
