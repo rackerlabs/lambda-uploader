@@ -39,6 +39,7 @@ def test_prepare_workspace():
 
     pkg = package.Package(TESTING_TEMP_DIR)
     pkg.prepare_workspace()
+    pkg.prepare_virtualenv()
     assert path.isdir(temp_workspace)
     assert path.isdir(path.join(temp_workspace, 'venv'))
     if sys.platform == 'win32' or sys.platform == 'cygwin':
@@ -61,6 +62,11 @@ def test_install_requirements():
         site_packages = path.join(temp_workspace, "venv\\lib\\site-packages")
 
     assert path.isdir(path.join(site_packages, '_pytest'))
+
+
+def test_existing_virtualenv():
+    pkg = package.Package(TESTING_TEMP_DIR, 'abc')
+    assert pkg._pkg_venv == 'abc'
 
 
 def test_package():

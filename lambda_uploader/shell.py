@@ -50,7 +50,7 @@ def _execute(args):
     cfg = config.Config(pth, args.config, role=args.role)
 
     _print('Building Package')
-    pkg = package.build_package(pth, cfg.requirements)
+    pkg = package.build_package(pth, cfg.requirements, args.virtualenv)
 
     if not args.no_clean:
         pkg.clean_workspace()
@@ -97,6 +97,9 @@ def main(arv=None):
                         action='store_const',
                         help='publish an upload to an immutable version',
                         const=True)
+    parser.add_argument('--virtualenv', '-e',
+                        help='use specified virtualenv instead of making one',
+                        default=None)
     parser.add_argument('--role', dest='role',
                         default=getenv('LAMBDA_UPLOADER_ROLE'),
                         help=('IAM role to assign the lambda function, '
