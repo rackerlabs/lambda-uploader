@@ -15,6 +15,7 @@
 import os
 import shutil
 import logging
+import re
 
 
 LOG = logging.getLogger(__name__)
@@ -45,6 +46,6 @@ def _ignore_file(path, ignore=[]):
     if not ignore:
         return False
     for ign in ignore:
-        if ign in path:
+        if re.search(ign, path):
             return True
     return False

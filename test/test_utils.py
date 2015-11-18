@@ -11,9 +11,10 @@ TEST_TREE = [
         'bar/foo.py',
         'bar/bar/foo.py',
         'ignore/foo.py'
+        'ignore-me.py'
         ]
 
-TEST_IGNORE = ['ignore/']
+TEST_IGNORE = ['ignore/*', 'ignore-me.py']
 
 
 def test_copy_tree():
