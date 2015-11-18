@@ -22,7 +22,7 @@ from subprocess import Popen, PIPE
 from lambda_uploader import utils
 
 LOG = logging.getLogger(__name__)
-TEMP_WORKSPACE_NAME = ".lambda_package"
+TEMP_WORKSPACE_NAME = ".lamba_uploader_temp"
 ZIPFILE_NAME = 'lambda_function.zip'
 
 
