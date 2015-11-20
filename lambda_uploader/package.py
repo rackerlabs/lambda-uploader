@@ -124,6 +124,8 @@ class Package(object):
 
         # Append the temp workspace to the ignore list
         ignore.append("^%s/*" % self._temp_workspace)
+        # Ignore .git and .pyc
+        ignore.append(['.git', '*.pyc'])
         utils.copy_tree(self._path, package, ignore)
         self._create_zip(package)
 
