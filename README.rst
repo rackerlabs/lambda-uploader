@@ -64,11 +64,18 @@ To specify an alternative profile that has been defined in
 
     lambda-uploader --profile=alternative-profile
 
-To specify an alternative, prexisting virtualenv use the ``--virtualenv`` parameter.
+To specify an alternative, prexisting virtualenv use the
+``--virtualenv`` parameter.
 
 .. code:: shell
 
     lambda-uploader --virtualenv=~/.virtualenv/my_custom_virtualenv
+
+To omit using a virtualenv use the ``--no-virtualenv`` parameter.
+
+.. code:: shell
+
+    lambda-uploader --no-virtualenv
 
 If you would prefer to upload another way you can tell the uploader to
 ignore the upload. This will create a package and leave it in the

@@ -1,5 +1,6 @@
 import os
 import sys
+import pytest
 
 from shutil import rmtree
 from os import path
@@ -53,9 +54,9 @@ def test_install_requirements():
     temp_workspace = path.join(TESTING_TEMP_DIR,
                                package.TEMP_WORKSPACE_NAME)
 
-    pkg = package.Package(TESTING_TEMP_DIR)
-    # pkg.prepare_workspace()
-    pkg.install_requirements(reqs)
+    pkg = package.Package(TESTING_TEMP_DIR, requirements=reqs)
+    pkg.prepare_virtualenv()
+
     site_packages = path.join(temp_workspace,
                               'venv/lib/python2.7/site-packages')
     if sys.platform == 'win32' or sys.platform == 'cygwin':
@@ -64,9 +65,39 @@ def test_install_requirements():
     assert path.isdir(path.join(site_packages, '_pytest'))
 
 
+def test_default_virtualenv():
+    temp_workspace = path.join(TESTING_TEMP_DIR,
+                               package.TEMP_WORKSPACE_NAME)
+    pkg = package.Package(TESTING_TEMP_DIR)
+    pkg.prepare_virtualenv()
+    # ensure we picked a real venv path if using default behavior
+    assert pkg._pkg_venv == ("%s/venv" % temp_workspace)
+
+
 def test_existing_virtualenv():
+    venv_dir = "virtualenv_test"
+    temp_virtualenv = path.join(TESTING_TEMP_DIR, venv_dir)
+    os.mkdir(temp_virtualenv)
+
+    pkg = package.Package(TESTING_TEMP_DIR, temp_virtualenv)
+    pkg.prepare_virtualenv()
+
+    assert pkg._pkg_venv == temp_virtualenv
+
+
+def test_bad_existing_virtualenv():
     pkg = package.Package(TESTING_TEMP_DIR, 'abc')
-    assert pkg._pkg_venv == 'abc'
+    with pytest.raises(Exception):
+        pkg.prepare_virtualenv()
+
+
+def test_omit_virtualenv():
+    pkg = package.Package(TESTING_TEMP_DIR, False)
+    pkg.prepare_virtualenv()
+    assert pkg._pkg_venv is False
+
+    with pytest.raises(Exception):
+        pkg.build_new_virtualenv()
 
 
 def test_package():

@@ -27,37 +27,24 @@ ZIPFILE_NAME = 'lambda_function.zip'
 
 
 def build_package(path, requirements, virtualenv=None, ignore=[]):
-    pkg = Package(path, virtualenv)
+    pkg = Package(path, virtualenv, requirements)
 
     pkg.clean_workspace()
     pkg.clean_zipfile()
     pkg.prepare_workspace()
-    if virtualenv:
-        if not os.path.isdir(virtualenv):
-            raise Exception("supplied virtualenv %s not found" % virtualenv)
-        LOG.info("Using existing virtualenv found in %s" % virtualenv)
-    else:
-        LOG.info('Building new virtualenv and installing requirements')
-        pkg.prepare_virtualenv()
-        pkg.install_requirements(requirements)
+    pkg.prepare_virtualenv()
     pkg.package(ignore)
     return pkg
 
 
 class Package(object):
-    def __init__(self, path, virtualenv=None):
+    def __init__(self, path, virtualenv=None, requirements=[]):
         self._path = path
         self._temp_workspace = os.path.join(path,
                                             TEMP_WORKSPACE_NAME)
         self.zip_file = os.path.join(path, ZIPFILE_NAME)
-
-        if virtualenv:
-            self._pkg_venv = virtualenv
-        else:
-            self._pkg_venv = os.path.join(self._temp_workspace, 'venv')
-            self._venv_pip = 'bin/pip'
-            if sys.platform == 'win32' or sys.platform == 'cygwin':
-                self._venv_pip = 'Scripts\pip.exe'
+        self._virtualenv = virtualenv
+        self._requirements = requirements
 
     def clean_workspace(self):
         if os.path.isdir(self._temp_workspace):
@@ -72,21 +59,59 @@ class Package(object):
         os.mkdir(self._temp_workspace)
 
     def prepare_virtualenv(self):
-        proc = Popen(["virtualenv", self._pkg_venv], stdout=PIPE, stderr=PIPE)
-        stdout, stderr = proc.communicate()
-        LOG.debug("Virtualenv stdout: %s" % stdout)
-        LOG.debug("Virtualenv stderr: %s" % stderr)
+        requirements_exist = \
+            self._requirements or os.path.isfile("requirements.txt")
+        if self._virtualenv and self._virtualenv is not False:
+            if not os.path.isdir(self._virtualenv):
+                raise Exception("virtualenv %s not found" % self._virtualenv)
+            LOG.info("Using existing virtualenv at %s" % self._virtualenv)
 
-        if proc.returncode is not 0:
-            raise Exception('virtualenv returned unsuccessfully')
+            # use supplied virtualenv path
+            self._pkg_venv = self._virtualenv
+        elif self._virtualenv is None and requirements_exist:
+            LOG.info('Building new virtualenv and installing requirements')
+            self.build_new_virtualenv()
+            self.install_requirements()
+        elif self._virtualenv is None and not requirements_exist:
+            LOG.info('No requirements found, so no virtualenv will be made')
+            self._pkg_venv = False
+        elif self._virtualenv is False:
+            LOG.info('Virtualenv has been omitted by supplied flag')
+            self._pkg_venv = False
+        else:
+            raise Exception('Cannot determine what to do about virtualenv')
 
-    def install_requirements(self, requirements):
+    def build_new_virtualenv(self):
+        if self._virtualenv is None:
+            # virtualenv was "None" which means "do default"
+            self._pkg_venv = os.path.join(self._temp_workspace, 'venv')
+            self._venv_pip = 'bin/pip'
+            if sys.platform == 'win32' or sys.platform == 'cygwin':
+                self._venv_pip = 'Scripts\pip.exe'
+
+            proc = Popen(["virtualenv", self._pkg_venv],
+                         stdout=PIPE, stderr=PIPE)
+            stdout, stderr = proc.communicate()
+            LOG.debug("Virtualenv stdout: %s" % stdout)
+            LOG.debug("Virtualenv stderr: %s" % stderr)
+
+            if proc.returncode is not 0:
+                raise Exception('virtualenv returned unsuccessfully')
+
+        else:
+            raise Exception('cannot build a new virtualenv when asked to omit')
+
+    def install_requirements(self):
+        if not hasattr(self, '_pkg_venv'):
+            err = 'Must call build_new_virtualenv before install_requirements'
+            raise Exception(err)
+
         cmd = None
-        if requirements:
+        if self._requirements:
             LOG.debug("Installing requirements found %s in config"
-                      % requirements)
+                      % self._requirements)
             cmd = [os.path.join(self._pkg_venv, self._venv_pip),
-                   'install'] + requirements
+                   'install'] + self._requirements
 
         elif os.path.isfile("requirements.txt"):
             # Pip install
@@ -109,18 +134,19 @@ class Package(object):
         # Copy site packages into package base
         LOG.info('Copying site packages')
 
-        site_packages = 'lib/python2.7/site-packages'
-        lib64_site_packages = 'lib64/python2.7/site-packages'
-        if sys.platform == 'win32' or sys.platform == 'cygwin':
-            lib64_site_packages = 'lib64\\site-packages'
-            site_packages = 'lib\\site-packages'
+        if hasattr(self, '_pkg_venv') and self._pkg_venv:
+            site_packages = 'lib/python2.7/site-packages'
+            lib64_site_packages = 'lib64/python2.7/site-packages'
+            if sys.platform == 'win32' or sys.platform == 'cygwin':
+                lib64_site_packages = 'lib64\\site-packages'
+                site_packages = 'lib\\site-packages'
 
-        utils.copy_tree(os.path.join(self._pkg_venv, site_packages),
-                        package)
-        lib64_path = os.path.join(self._pkg_venv, lib64_site_packages)
-        if not os.path.islink(lib64_path):
-            LOG.info('Copying lib64 site packages')
-            utils.copy_tree(lib64_path, package)
+            utils.copy_tree(os.path.join(self._pkg_venv, site_packages),
+                            package)
+            lib64_path = os.path.join(self._pkg_venv, lib64_site_packages)
+            if not os.path.islink(lib64_path):
+                LOG.info('Copying lib64 site packages')
+                utils.copy_tree(lib64_path, package)
 
         # Append the temp workspace to the ignore list
         ignore.append("^%s/*" % self._temp_workspace)
