@@ -57,6 +57,11 @@ To specify an alternative, prexisting virtualenv use the `--virtualenv` paramete
 lambda-uploader --virtualenv=~/.virtualenv/my_custom_virtualenv
 ```
 
+To omit using a virtualenv use the `--no-virtualenv` parameter.
+```shell
+lambda-uploader --no-virtualenv
+```
+
 If you would prefer to upload another way you can tell the uploader to ignore the upload.
 This will create a package and leave it in the project directory.
 ```shell

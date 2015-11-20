@@ -49,9 +49,19 @@ def _execute(args):
 
     cfg = config.Config(pth, args.config, role=args.role)
 
+    if args.no_virtualenv:
+        # specified flag to omit entirely
+        venv = False
+    elif args.virtualenv:
+        # specified a custom virtualenv
+        venv = args.virtualenv
+    else:
+        # build and include virtualenv, the default
+        venv = None
+
     _print('Building Package')
     pkg = package.build_package(pth, cfg.requirements,
-                                args.virtualenv, cfg.ignore)
+                                venv, cfg.ignore)
 
     if not args.no_clean:
         pkg.clean_workspace()
@@ -101,6 +111,10 @@ def main(arv=None):
     parser.add_argument('--virtualenv', '-e',
                         help='use specified virtualenv instead of making one',
                         default=None)
+    parser.add_argument('--no-virtualenv', dest='no_virtualenv',
+                        action='store_const',
+                        help='do not create or include a virtualenv at all',
+                        const=True)
     parser.add_argument('--role', dest='role',
                         default=getenv('LAMBDA_UPLOADER_ROLE'),
                         help=('IAM role to assign the lambda function, '
