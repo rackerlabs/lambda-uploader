@@ -29,7 +29,11 @@ Example lambda.json file:
   "handler": "function.lambda_handler",
   "role": "arn:aws:iam::00000000000:role/lambda_basic_execution",
   "requirements": ["pygithub"],
-  "ignore": ["circle.yml"],
+  "ignore": [
+    "circle.yml",
+    ".git",
+    "*.pyc"
+  ],
   "timeout": 30,
   "memory": 512
 }
