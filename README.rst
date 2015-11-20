@@ -42,7 +42,11 @@ Example lambda.json file:
       "handler": "function.lambda_handler",
       "role": "arn:aws:iam::00000000000:role/lambda_basic_execution",
       "requirements": ["pygithub"],
-      "ignore": ["circle.yml"],
+      "ignore": [
+        "circle.yml",
+        ".git",
+        "*.pyc"
+      ],
       "timeout": 30,
       "memory": 512
     }
@@ -64,7 +68,8 @@ To specify an alternative profile that has been defined in
 
     lambda-uploader --profile=alternative-profile
 
-To specify an alternative, prexisting virtualenv use the ``--virtualenv`` parameter.
+To specify an alternative, prexisting virtualenv use the
+``--virtualenv`` parameter.
 
 .. code:: shell
 
