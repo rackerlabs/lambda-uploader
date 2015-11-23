@@ -1,13 +1,15 @@
 lambda-uploader CHANGELOG
 =========================
 
-Unreleased
-----------
+0.4.0
+-----
 - Added support for ignoring files
 - Added the ability to use an existing virtual environment
 - Fixed the temporary workspace name to prevent confusion
 - Updated the virtualenv site-packages copy to include lib64 if it
   is not a symlink
+- Add --no-virtualenv flag and set the default behavior to no longer create
+  a virtual environment unless package requirements are found
 
 0.3.0
 -----
