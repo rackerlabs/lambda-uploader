@@ -26,7 +26,13 @@ TEMP_WORKSPACE_NAME = ".lamba_uploader_temp"
 ZIPFILE_NAME = 'lambda_function.zip'
 
 
-def build_package(path, requirements, virtualenv=None, ignore=[], zipfile_name=ZIPFILE_NAME):
+def build_package(
+    path,
+    requirements,
+    virtualenv=None,
+    ignore=[],
+    zipfile_name=ZIPFILE_NAME
+):
     pkg = Package(path, virtualenv, requirements, zipfile_name)
 
     pkg.clean_workspace()
@@ -38,7 +44,13 @@ def build_package(path, requirements, virtualenv=None, ignore=[], zipfile_name=Z
 
 
 class Package(object):
-    def __init__(self, path, virtualenv=None, requirements=[], zipfile_name=ZIPFILE_NAME):
+    def __init__(
+        self,
+        path,
+        virtualenv=None,
+        requirements=[],
+        zipfile_name=ZIPFILE_NAME
+    ):
         self._path = path
         self._temp_workspace = os.path.join(path,
                                             TEMP_WORKSPACE_NAME)
