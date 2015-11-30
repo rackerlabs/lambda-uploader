@@ -26,8 +26,8 @@ TEMP_WORKSPACE_NAME = ".lamba_uploader_temp"
 ZIPFILE_NAME = 'lambda_function.zip'
 
 
-def build_package(path, requirements, virtualenv=None, ignore=[]):
-    pkg = Package(path, virtualenv, requirements)
+def build_package(path, requirements, virtualenv=None, ignore=[], zipfile_name=ZIPFILE_NAME):
+    pkg = Package(path, virtualenv, requirements, zipfile_name)
 
     pkg.clean_workspace()
     pkg.clean_zipfile()
@@ -38,11 +38,11 @@ def build_package(path, requirements, virtualenv=None, ignore=[]):
 
 
 class Package(object):
-    def __init__(self, path, virtualenv=None, requirements=[]):
+    def __init__(self, path, virtualenv=None, requirements=[], zipfile_name=ZIPFILE_NAME):
         self._path = path
         self._temp_workspace = os.path.join(path,
                                             TEMP_WORKSPACE_NAME)
-        self.zip_file = os.path.join(path, ZIPFILE_NAME)
+        self.zip_file = os.path.join(path, zipfile_name)
         self._virtualenv = virtualenv
         self._requirements = requirements
 
@@ -154,9 +154,8 @@ class Package(object):
         self._create_zip(package)
 
     def _create_zip(self, src):
-        zfile = os.path.join(self._path, ZIPFILE_NAME)
         LOG.info('Creating zipfile')
-        zf = zipfile.ZipFile(zfile, "w", zipfile.ZIP_DEFLATED)
+        zf = zipfile.ZipFile(self.zip_file, "w", zipfile.ZIP_DEFLATED)
         abs_src = os.path.abspath(src)
         for root, _, files in os.walk(src):
             for filename in files:
