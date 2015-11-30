@@ -104,3 +104,9 @@ def test_package():
     pkg = package.Package(TESTING_TEMP_DIR)
     pkg.package()
     assert path.isfile(path.join(TESTING_TEMP_DIR, 'lambda_function.zip'))
+
+
+def test_package_name():
+    pkg = package.Package(TESTING_TEMP_DIR, zipfile_name='test.zip')
+    pkg.package()
+    assert path.isfile(path.join(TESTING_TEMP_DIR, 'test.zip'))
