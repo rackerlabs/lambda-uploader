@@ -1,6 +1,11 @@
 lambda-uploader CHANGELOG
 =========================
 
+0.5.0
+-----
+- Added optional zip file name to package class(API only)
+- Updated boto3 version to 1.2.2
+
 0.4.0
 -----
 - Added support for ignoring files
