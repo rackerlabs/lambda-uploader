@@ -32,7 +32,7 @@ Example lambda.json file:
   "ignore": [
     "circle.yml",
     ".git",
-    "*.pyc"
+    "/*.pyc"
   ],
   "timeout": 30,
   "memory": 512
