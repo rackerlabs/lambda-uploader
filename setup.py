@@ -45,7 +45,6 @@ setup(
     install_requires=DEPENDENCIES,
     packages=find_packages(exclude=['tests']),
     classifiers=[
-        "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
     ],
     license=_lu_meta['license'],
