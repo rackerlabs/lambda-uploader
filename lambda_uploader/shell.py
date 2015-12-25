@@ -91,6 +91,10 @@ def _execute(args):
 
 def main(arv=None):
     """lambda-uploader command line interface."""
+    # Check for Python 2.7 (required for Lambda)
+    if not (sys.version_info[0] == 2 and sys.version_info[1] == 7):
+        raise RuntimeError('lambda-uploader requires Python 2.7')
+
     import argparse
 
     parser = argparse.ArgumentParser(
