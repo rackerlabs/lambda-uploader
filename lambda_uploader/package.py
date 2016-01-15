@@ -71,8 +71,9 @@ class Package(object):
         os.mkdir(self._temp_workspace)
 
     def prepare_virtualenv(self):
+        requirements_file = os.path.join(self._path, "requirements.txt")
         requirements_exist = \
-            self._requirements or os.path.isfile("requirements.txt")
+            self._requirements or os.path.isfile(requirements_file)
         if self._virtualenv and self._virtualenv is not False:
             if not os.path.isdir(self._virtualenv):
                 raise Exception("virtualenv %s not found" % self._virtualenv)
@@ -125,11 +126,12 @@ class Package(object):
             cmd = [os.path.join(self._pkg_venv, self._venv_pip),
                    'install'] + self._requirements
 
-        elif os.path.isfile("requirements.txt"):
+        elif os.path.isfile(os.path.join(self._path, "requirements.txt")):
             # Pip install
             LOG.debug("Installing requirements from requirements.txt file")
             cmd = [os.path.join(self._pkg_venv, self._venv_pip),
-                   "install", "-r", "requirements.txt"]
+                   "install", "-r",
+                   os.path.join(self._path, "requirements.txt")]
 
         if cmd is not None:
             prc = Popen(cmd, stdout=PIPE, stderr=PIPE)

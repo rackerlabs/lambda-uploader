@@ -38,7 +38,8 @@ def test_prepare_workspace():
     temp_workspace = path.join(TESTING_TEMP_DIR,
                                package.TEMP_WORKSPACE_NAME)
 
-    pkg = package.Package(TESTING_TEMP_DIR)
+    reqs = ['pytest']
+    pkg = package.Package(TESTING_TEMP_DIR, requirements=reqs)
     pkg.prepare_workspace()
     pkg.prepare_virtualenv()
     assert path.isdir(temp_workspace)
@@ -68,7 +69,8 @@ def test_install_requirements():
 def test_default_virtualenv():
     temp_workspace = path.join(TESTING_TEMP_DIR,
                                package.TEMP_WORKSPACE_NAME)
-    pkg = package.Package(TESTING_TEMP_DIR)
+    reqs = ['pytest']
+    pkg = package.Package(TESTING_TEMP_DIR, requirements=reqs)
     pkg.prepare_virtualenv()
     # ensure we picked a real venv path if using default behavior
     assert pkg._pkg_venv == ("%s/venv" % temp_workspace)
