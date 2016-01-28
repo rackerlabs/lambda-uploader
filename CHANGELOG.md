@@ -1,6 +1,11 @@
 lambda-uploader CHANGELOG
 =========================
 
+0.5.1
+-----
+- Set hard Python requirements on 2.7
+- Fixed issue with lambda-uploader only looking for requirements.txt in the cwd
+
 0.5.0
 -----
 - Added optional zip file name to package class(API only)
