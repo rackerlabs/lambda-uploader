@@ -24,6 +24,7 @@ from lambda_uploader import utils
 LOG = logging.getLogger(__name__)
 TEMP_WORKSPACE_NAME = ".lambda_uploader_temp"
 ZIPFILE_NAME = 'lambda_function.zip'
+MAX_PACKAGE_SIZE = 50000000
 
 
 def build_package(
@@ -40,6 +41,7 @@ def build_package(
     pkg.prepare_workspace()
     pkg.prepare_virtualenv()
     pkg.package(ignore)
+    pkg.check_current_package_size()
     return pkg
 
 
@@ -65,6 +67,10 @@ class Package(object):
     def clean_zipfile(self):
         if os.path.isfile(self.zip_file):
             os.remove(self.zip_file)
+
+    def check_current_package_size(self):
+        if os.path.getsize(self.zip_file) > MAX_PACKAGE_SIZE:
+            LOG.warning("Size of your deployment package is larger than 50MB!")
 
     def prepare_workspace(self):
         # Setup temporary workspace
