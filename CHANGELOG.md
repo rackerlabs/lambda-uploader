@@ -1,6 +1,10 @@
 lambda-uploader CHANGELOG
 =========================
 
+Unreleased
+----------
+- Warn if the lambda package is over the current AWS max size of 50MB
+
 0.5.1
 -----
 - Set hard Python requirements on 2.7
