@@ -149,6 +149,14 @@ class Package(object):
                 raise Exception('pip returned unsuccessfully')
 
     def package(self, ignore=[]):
+        """
+        Create a zip file of the lambda script and its dependencies.
+
+        :param list ignore: a list of regular expression strings to match paths
+            of files in the source of the lambda script against and ignore
+            those files when creating the zip file. The paths to be matched are
+            local to the source root.
+        """
         package = os.path.join(self._temp_workspace, 'lambda_package')
 
         # Copy site packages into package base
@@ -168,8 +176,8 @@ class Package(object):
                 LOG.info('Copying lib64 site packages')
                 utils.copy_tree(lib64_path, package)
 
-        # Append the temp workspace to the ignore list
-        ignore.append("^%s/*" % self._temp_workspace)
+        # Append the temp workspace to the ignore list:
+        ignore += ["^%s/*" % TEMP_WORKSPACE_NAME]
         utils.copy_tree(self._path, package, ignore)
         self._create_zip(package)
 

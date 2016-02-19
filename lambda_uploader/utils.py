@@ -27,7 +27,8 @@ def copy_tree(src, dest, ignore=[]):
     for root, _, files in os.walk(src):
         for filename in files:
             path = os.path.join(root, filename)
-            if _ignore_file(path, ignore):
+            path_relative_to_the_source_dir = os.path.relpath(path, src)
+            if _ignore_file(path_relative_to_the_source_dir, ignore):
                 continue
 
             sub_dirs = os.path.dirname(os.path.relpath(path,
