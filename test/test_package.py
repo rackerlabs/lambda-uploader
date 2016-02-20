@@ -31,7 +31,7 @@ def test_package_clean_workspace():
 
     pkg = package.Package(TESTING_TEMP_DIR)
     pkg.clean_workspace()
-    assert path.isdir(temp_workspace) == False
+    assert path.isdir(temp_workspace) is False
 
 
 def test_prepare_workspace():
