@@ -176,6 +176,12 @@ class Package(object):
                 LOG.info('Copying lib64 site packages')
                 utils.copy_tree(lib64_path, package)
 
+        #AWS Lambda has issues with the normal protobuf install lacking a root level __init__.py
+        protobuf_install_dir = os.path.join(package,'google')
+        protobuf_init_file = os.path.join(protobuf_install_dir,'__init__.py')
+        if os.path.exists(protobuf_install_dir) and not os.path.exists(protobuf_init_file):
+            open(protobuf_init_file, 'a').close()
+
         # Append the temp workspace to the ignore list:
         ignore += ["^%s/*" % TEMP_WORKSPACE_NAME]
         utils.copy_tree(self._path, package, ignore)
