@@ -1,1 +1,2 @@
-boto3==1.1.4
+boto3==1.2.2
+virtualenv
