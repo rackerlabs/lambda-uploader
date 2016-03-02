@@ -130,7 +130,7 @@ def main(arv=None):
                         default=None, help=alias_help)
     parser.add_argument('--alias-description', '-m', dest='alias_description',
                         default=None, help='alias description')
-    parser.add_argument('--config', help='Overrides lambda.json',
+    parser.add_argument('--config', '-c', help='Overrides lambda.json',
                         default=None)
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
                         help='lambda function directory')
