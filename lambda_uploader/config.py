@@ -21,7 +21,7 @@ REQUIRED_PARAMS = {u'name': basestring, u'description': basestring,
 
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
-                  u'ignore': []}
+                  u'ignore': [], u'function_path': ''}
 
 
 class Config(object):

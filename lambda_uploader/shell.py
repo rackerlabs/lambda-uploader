@@ -60,6 +60,8 @@ def _execute(args):
         venv = None
 
     _print('Building Package')
+    if cfg.function_path:
+        pth = cfg.function_path
     pkg = package.build_package(pth, cfg.requirements,
                                 venv, cfg.ignore)
 
