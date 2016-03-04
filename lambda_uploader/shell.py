@@ -60,6 +60,8 @@ def _execute(args):
         venv = None
 
     _print('Building Package')
+    for p in args.extra_files:
+        package.extra_file(p)
     if cfg.function_path:
         pth = cfg.function_path
     pkg = package.build_package(pth, cfg.requirements,
@@ -117,6 +119,10 @@ def main(arv=None):
     parser.add_argument('--virtualenv', '-e',
                         help='use specified virtualenv instead of making one',
                         default=None)
+    parser.add_argument('--extra-files', '-x',
+                        action='append',
+                        help='include file or directory path in package',
+                        default=[])
     parser.add_argument('--no-virtualenv', dest='no_virtualenv',
                         action='store_const',
                         help='do not create or include a virtualenv at all',

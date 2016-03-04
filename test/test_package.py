@@ -7,6 +7,8 @@ from os import path
 from lambda_uploader import package
 
 TESTING_TEMP_DIR = '.testing_temp'
+WORKING_TEMP_DIR = path.join(TESTING_TEMP_DIR, '.lambda_uploader_temp')
+PACKAGE_TEMP_DIR = path.join(WORKING_TEMP_DIR, 'lambda_package')
 
 
 def setup_module(module):
@@ -105,6 +107,21 @@ def test_package():
     pkg = package.Package(TESTING_TEMP_DIR)
     pkg.package()
     assert path.isfile(path.join(TESTING_TEMP_DIR, 'lambda_function.zip'))
+
+
+def test_package_with_extras():
+    pkg = package.Package(TESTING_TEMP_DIR)
+    pkg.extra_file(path.join('test', 'extra'))
+    pkg.extra_file(path.join('test', 'dummyfile'))
+    pkg.package()
+
+    # test a single file
+    expected_extra_file1 = path.join(PACKAGE_TEMP_DIR, 'dummyfile')
+    assert path.isfile(expected_extra_file1)
+
+    # test a recursive directory
+    expected_extra_file2 = path.join(PACKAGE_TEMP_DIR, 'foo/__init__.py')
+    assert path.isfile(expected_extra_file2)
 
 
 def test_package_name():

@@ -48,6 +48,7 @@ class Package(object):
         self._virtualenv = None
         self._skip_virtualenv = False
         self._requirements = None
+        self._extra_files = []
 
     def build(self, ignore=[]):
         '''Calls all necessary methods to build the Lambda Package'''
@@ -105,6 +106,12 @@ class Package(object):
             # use supplied virtualenv path
             self._pkg_venv = self._virtualenv
             self._skip_virtualenv = True
+
+    def extra_file(self, element):
+        '''
+        Sets an additional file or path that we copy into the resulting package
+        '''
+        self._extra_files.append(element)
 
     def install_dependencies(self):
         ''' Creates a virtualenv and installs requirements '''
@@ -215,6 +222,15 @@ class Package(object):
             if not os.path.islink(lib64_path):
                 LOG.info('Copying lib64 site packages')
                 utils.copy_tree(lib64_path, package)
+
+        for p in self._extra_files:
+            LOG.info('Copying extra %s into package' % p)
+            if os.path.isdir(p):
+                utils.copy_tree(p, package)
+                ignore += ["^%s/*" % p]
+            else:
+                shutil.copy(p, package)
+                ignore += ["%s" % p]
 
         # Append the temp workspace to the ignore list:
         ignore += ["^%s/*" % TEMP_WORKSPACE_NAME]
