@@ -29,9 +29,10 @@ MAX_PACKAGE_SIZE = 50000000
 
 def build_package(path, requirements, virtualenv=None, ignore=[],
                   zipfile_name=ZIPFILE_NAME):
-    pkg = Package(path, virtualenv, requirements, zipfile_name)
+    pkg = Package(path, zipfile_name)
 
-    pkg.virtualenv(virtualenv)
+    if virtualenv is not None:
+        pkg.virtualenv(virtualenv)
     pkg.requirements(requirements)
     pkg.build(ignore)
 
@@ -43,10 +44,11 @@ class Package(object):
         self._path = path
         self._temp_workspace = os.path.join(path,
                                             TEMP_WORKSPACE_NAME)
+
         self.zip_file = os.path.join(path, zipfile_name)
-        self.virtualenv = virtualenv
+        self._virtualenv = None
         self._skip_virtualenv = False
-        self.requirements = None
+        self._requirements = None
 
     def build(self, ignore=[]):
         '''Calls all necessary methods to build the Lambda Package'''
@@ -94,7 +96,7 @@ class Package(object):
         should be skipped.
         '''
         # If a boolean is passed then set the internal _skip_virtualenv flag
-        if not isinstance(self._virtualenv, bool):
+        if isinstance(virtualenv, bool):
             self._skip_virtualenv = virtualenv
         else:
             self._virtualenv = virtualenv
@@ -103,6 +105,7 @@ class Package(object):
             LOG.info("Using existing virtualenv at %s" % self._virtualenv)
             # use supplied virtualenv path
             self._pkg_venv = self._virtualenv
+            self._skip_virtualenv = True
 
     def install_dependencies(self):
         ''' Creates a virtualenv and installs requirements '''
@@ -125,9 +128,11 @@ class Package(object):
             raise Exception('Cannot determine what to do about virtualenv')
 
     def _prepare_workspace(self):
-        '''Remove existing workspace if it exists and/or create a new workspace'''
+        '''
+        Remove existing workspace if it exists and/or create a new workspace
+        '''
         # Wipe out existing workspace
-        clean_workspace()
+        self.clean_workspace()
         # Setup temporary workspace
         os.mkdir(self._temp_workspace)
 
@@ -152,9 +157,11 @@ class Package(object):
         else:
             raise Exception('cannot build a new virtualenv when asked to omit')
 
-
     def _install_requirements(self):
-        ''' Create a new virtualenvironment and install requirements if there are any '''
+        '''
+        Create a new virtualenvironment and install requirements
+        if there are any.
+        '''
         if not hasattr(self, '_pkg_venv'):
             err = 'Must call build_new_virtualenv before install_requirements'
             raise Exception(err)

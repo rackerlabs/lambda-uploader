@@ -38,10 +38,9 @@ def test_prepare_workspace():
     temp_workspace = path.join(TESTING_TEMP_DIR,
                                package.TEMP_WORKSPACE_NAME)
 
-    reqs = ['pytest']
-    pkg = package.Package(TESTING_TEMP_DIR, requirements=reqs)
-    pkg.prepare_workspace()
-    pkg.prepare_virtualenv()
+    pkg = package.Package(TESTING_TEMP_DIR)
+    pkg.requirements(['pytest'])
+    pkg.install_dependencies()
     assert path.isdir(temp_workspace)
     assert path.isdir(path.join(temp_workspace, 'venv'))
     if sys.platform == 'win32' or sys.platform == 'cygwin':
@@ -51,12 +50,12 @@ def test_prepare_workspace():
 
 
 def test_install_requirements():
-    reqs = ['pytest']
     temp_workspace = path.join(TESTING_TEMP_DIR,
                                package.TEMP_WORKSPACE_NAME)
 
-    pkg = package.Package(TESTING_TEMP_DIR, requirements=reqs)
-    pkg.prepare_virtualenv()
+    pkg = package.Package(TESTING_TEMP_DIR)
+    pkg.requirements(['pytest'])
+    pkg.install_dependencies()
 
     site_packages = path.join(temp_workspace,
                               'venv/lib/python2.7/site-packages')
@@ -70,8 +69,9 @@ def test_default_virtualenv():
     temp_workspace = path.join(TESTING_TEMP_DIR,
                                package.TEMP_WORKSPACE_NAME)
     reqs = ['pytest']
-    pkg = package.Package(TESTING_TEMP_DIR, requirements=reqs)
-    pkg.prepare_virtualenv()
+    pkg = package.Package(TESTING_TEMP_DIR)
+    pkg.requirements = reqs
+    pkg._build_new_virtualenv()
     # ensure we picked a real venv path if using default behavior
     assert pkg._pkg_venv == ("%s/venv" % temp_workspace)
 
@@ -82,24 +82,23 @@ def test_existing_virtualenv():
     os.mkdir(temp_virtualenv)
 
     pkg = package.Package(TESTING_TEMP_DIR, temp_virtualenv)
-    pkg.prepare_virtualenv()
+    pkg.virtualenv(temp_virtualenv)
+    pkg.install_dependencies()
 
     assert pkg._pkg_venv == temp_virtualenv
 
 
 def test_bad_existing_virtualenv():
-    pkg = package.Package(TESTING_TEMP_DIR, 'abc')
+    pkg = package.Package(TESTING_TEMP_DIR)
     with pytest.raises(Exception):
-        pkg.prepare_virtualenv()
+        pkg.virtualenv('abc')
 
 
 def test_omit_virtualenv():
-    pkg = package.Package(TESTING_TEMP_DIR, False)
-    pkg.prepare_virtualenv()
+    pkg = package.Package(TESTING_TEMP_DIR)
+    pkg.virtualenv(False)
+    pkg.install_dependencies()
     assert pkg._pkg_venv is False
-
-    with pytest.raises(Exception):
-        pkg.build_new_virtualenv()
 
 
 def test_package():
