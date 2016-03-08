@@ -1,4 +1,4 @@
-# Copyright 2015 Rackspace US, Inc.
+# Copyright 2015-2016 Rackspace US, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,5 +15,5 @@
 __title__ = 'lambda_uploader'
 __version__ = '0.5.1'
 __license__ = 'Apache 2.0'
-__copyright__ = 'Copyright Rackspace US, Inc. 2015'
+__copyright__ = 'Copyright Rackspace US, Inc. 2015-2016'
 __url__ = 'https://github.com/rackerlabs/lambda-uploader'
