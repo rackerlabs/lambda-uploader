@@ -62,6 +62,11 @@ To omit using a virtualenv use the `--no-virtualenv` parameter.
 lambda-uploader --no-virtualenv
 ```
 
+To inject any other additional files, use the `--extra-file EXTRA_FILE` parameter.
+```shell
+lambda-uploader --extra-file ~/stuff_for_lambda_packages
+```
+
 If you would prefer to upload another way you can tell the uploader to ignore the upload.
 This will create a package and leave it in the project directory.
 ```shell
