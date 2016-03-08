@@ -1,4 +1,4 @@
-# Copyright 2015 Rackspace US, Inc.
+# Copyright 2015-2016 Rackspace US, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,83 +24,119 @@ from lambda_uploader import utils
 LOG = logging.getLogger(__name__)
 TEMP_WORKSPACE_NAME = ".lambda_uploader_temp"
 ZIPFILE_NAME = 'lambda_function.zip'
-MAX_PACKAGE_SIZE = 50000000
 
 
-def build_package(
-    path,
-    requirements,
-    virtualenv=None,
-    ignore=[],
-    zipfile_name=ZIPFILE_NAME
-):
-    pkg = Package(path, virtualenv, requirements, zipfile_name)
+def build_package(path, requirements, virtualenv=None, ignore=[],
+                  zipfile_name=ZIPFILE_NAME):
+    pkg = Package(path, zipfile_name)
 
-    pkg.clean_workspace()
-    pkg.clean_zipfile()
-    pkg.prepare_workspace()
-    pkg.prepare_virtualenv()
-    pkg.package(ignore)
-    pkg.check_current_package_size()
+    if virtualenv is not None:
+        pkg.virtualenv(virtualenv)
+    pkg.requirements(requirements)
+    pkg.build(ignore)
+
     return pkg
 
 
 class Package(object):
-    def __init__(
-        self,
-        path,
-        virtualenv=None,
-        requirements=[],
-        zipfile_name=ZIPFILE_NAME
-    ):
+    def __init__(self, path, zipfile_name=ZIPFILE_NAME):
         self._path = path
         self._temp_workspace = os.path.join(path,
                                             TEMP_WORKSPACE_NAME)
+
         self.zip_file = os.path.join(path, zipfile_name)
-        self._virtualenv = virtualenv
-        self._requirements = requirements
+        self._virtualenv = None
+        self._skip_virtualenv = False
+        self._requirements = None
+
+    def build(self, ignore=[]):
+        '''Calls all necessary methods to build the Lambda Package'''
+        self._prepare_workspace()
+        self.install_dependencies()
+        self.package(ignore)
 
     def clean_workspace(self):
+        '''Clean up the temporary workspace if one exists'''
         if os.path.isdir(self._temp_workspace):
             shutil.rmtree(self._temp_workspace)
 
     def clean_zipfile(self):
+        '''remove existing zipfile'''
         if os.path.isfile(self.zip_file):
             os.remove(self.zip_file)
 
-    def check_current_package_size(self):
-        if os.path.getsize(self.zip_file) > MAX_PACKAGE_SIZE:
-            LOG.warning("Size of your deployment package is larger than 50MB!")
+    def requirements(self, requirements):
+        '''
+        Sets the requirements for the package.
 
-    def prepare_workspace(self):
-        # Setup temporary workspace
-        os.mkdir(self._temp_workspace)
+        It will take either a valid path to a requirements file or
+        a list of requirements.
+        '''
+        if requirements:
+            if isinstance(requirements, str) and \
+               os.path.isfile(os.path.normpath(requirements)):
+                self._requirements_file = os.path.normpath(requirements)
+                self._requirements = None
+            else:
+                if isinstance(self._requirements, str):
+                    requirements = requirements.split()
+                self._requirements_file = None
+                self._requirements = requirements
+        else:
+            self._requirements, self._requirements_file = None
 
-    def prepare_virtualenv(self):
-        requirements_file = os.path.join(self._path, "requirements.txt")
-        requirements_exist = \
-            self._requirements or os.path.isfile(requirements_file)
-        if self._virtualenv and self._virtualenv is not False:
+    def virtualenv(self, virtualenv):
+        '''
+        Sets the virtual environment for the lambda package
+
+        If this is not set then package_dependencies will create a new one.
+
+        Takes a path to a virtualenv or a boolean if the virtualenv creation
+        should be skipped.
+        '''
+        # If a boolean is passed then set the internal _skip_virtualenv flag
+        if isinstance(virtualenv, bool):
+            self._skip_virtualenv = virtualenv
+        else:
+            self._virtualenv = virtualenv
             if not os.path.isdir(self._virtualenv):
                 raise Exception("virtualenv %s not found" % self._virtualenv)
             LOG.info("Using existing virtualenv at %s" % self._virtualenv)
-
             # use supplied virtualenv path
             self._pkg_venv = self._virtualenv
-        elif self._virtualenv is None and requirements_exist:
+            self._skip_virtualenv = True
+
+    def install_dependencies(self):
+        ''' Creates a virtualenv and installs requirements '''
+        # If virtualenv is set to skip then do nothing
+        if self._skip_virtualenv:
+            LOG.info('Skip Virtualenv set ... nothing to do')
+            return
+
+        requirements_file = os.path.join(self._path, "requirements.txt")
+        requirements_exist = \
+            self._requirements or os.path.isfile(requirements_file)
+        if self._virtualenv is None and requirements_exist:
             LOG.info('Building new virtualenv and installing requirements')
-            self.build_new_virtualenv()
-            self.install_requirements()
+            self._build_new_virtualenv()
+            self._install_requirements()
         elif self._virtualenv is None and not requirements_exist:
             LOG.info('No requirements found, so no virtualenv will be made')
-            self._pkg_venv = False
-        elif self._virtualenv is False:
-            LOG.info('Virtualenv has been omitted by supplied flag')
             self._pkg_venv = False
         else:
             raise Exception('Cannot determine what to do about virtualenv')
 
-    def build_new_virtualenv(self):
+    def _prepare_workspace(self):
+        '''
+        Remove existing workspace if it exists and/or create a new workspace
+        '''
+        # Wipe out existing workspace
+        self.clean_workspace()
+        # Setup temporary workspace
+        os.mkdir(self._temp_workspace)
+
+    def _build_new_virtualenv(self):
+        '''Build a new virtualenvironment if self._virtualenv is set to None'''
         if self._virtualenv is None:
             # virtualenv was "None" which means "do default"
             self._pkg_venv = os.path.join(self._temp_workspace, 'venv')
@@ -120,7 +156,11 @@ class Package(object):
         else:
             raise Exception('cannot build a new virtualenv when asked to omit')
 
-    def install_requirements(self):
+    def _install_requirements(self):
+        '''
+        Create a new virtualenvironment and install requirements
+        if there are any.
+        '''
         if not hasattr(self, '_pkg_venv'):
             err = 'Must call build_new_virtualenv before install_requirements'
             raise Exception(err)

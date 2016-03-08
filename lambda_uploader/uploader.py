@@ -15,7 +15,10 @@
 import boto3
 import logging
 
+from os import path
+
 LOG = logging.getLogger(__name__)
+MAX_PACKAGE_SIZE = 50000000
 
 
 class PackageUploader(object):
@@ -33,6 +36,7 @@ class PackageUploader(object):
     returns the package version
     '''
     def upload_existing(self, pkg):
+        self._validate_package_size(pkg.zipfile)
         with open(pkg.zip_file, "rb") as fil:
             zip_file = fil.read()
 
@@ -73,6 +77,7 @@ class PackageUploader(object):
     returns the package version
     '''
     def upload_new(self, pkg):
+        self._validate_package_size(pkg.zipfile)
         with open(pkg.zip_file, "rb") as fil:
             zip_file = fil.read()
 
@@ -159,3 +164,10 @@ class PackageUploader(object):
                 Description=self._config.alias_description,
                 )
         LOG.debug("AWS update_alias response: %s" % resp)
+
+    def _validate_package_size(self, pkg):
+        '''
+        Logs a warning if the package size is over the current max package size
+        '''
+        if path.getsize(pkg) > MAX_PACKAGE_SIZE:
+            LOG.warning("Size of your deployment package is larger than 50MB!")
