@@ -64,7 +64,11 @@ def _execute(args):
         package.extra_file(p)
     if cfg.function_path:
         pth = cfg.function_path
-    pkg = package.build_package(pth, cfg.requirements,
+
+    requirements = cfg.requirements
+    if args.requirements:
+        requirements = path.abspath(args.requirements)
+    pkg = package.build_package(pth, requirements,
                                 venv, cfg.ignore)
 
     if not args.no_clean:
@@ -133,6 +137,8 @@ def main(arv=None):
                               'can be set with $LAMBDA_UPLOADER_ROLE'))
     parser.add_argument('--profile', dest='profile',
                         help='specify AWS cli profile')
+    parser.add_argument('--requirements', '-r', dest='requirements',
+                        help='specify a requirements.txt file')
     alias_help = 'alias for published version (WILL SET THE PUBLISH FLAG)'
     parser.add_argument('--alias', '-a', dest='alias',
                         default=None, help=alias_help)
