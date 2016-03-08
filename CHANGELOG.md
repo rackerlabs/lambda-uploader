@@ -1,9 +1,19 @@
 lambda-uploader CHANGELOG
 =========================
 
-Unreleased
-----------
+1.0.0(Unreleased)
+-----------------
 - Warn if the lambda package is over the current AWS max size of 50MB
+- Add --extra-file flag for adding arbitrary file(s) outside of the
+  project directory.
+- Add --requirements flag to allow setting a requirements file as a CLI
+  option
+- Updated the Package() object so only the build() method actually needs
+  to be called.
+- Updated the Package() constructor and removed most of the allowed
+  variables in favor of calling setter methods.
+- Add -c shorthand to the --config flag
+- Fixed the ignores to match against paths relative to the source dir
 
 0.5.1
 -----
