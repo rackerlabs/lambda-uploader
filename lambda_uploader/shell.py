@@ -62,8 +62,6 @@ def _execute(args):
     _print('Building Package')
     for p in args.extra_files:
         package.extra_file(p)
-    if cfg.function_path:
-        pth = cfg.function_path
 
     requirements = cfg.requirements
     if args.requirements:
