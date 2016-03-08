@@ -48,6 +48,7 @@ class Package(object):
         self._virtualenv = None
         self._skip_virtualenv = False
         self._requirements = None
+        self._requirements_file = os.path.join(self._path, "requirements.txt")
         self._extra_files = []
 
     def build(self, ignore=[]):
@@ -75,8 +76,8 @@ class Package(object):
         '''
         if requirements:
             if isinstance(requirements, str) and \
-               os.path.isfile(os.path.normpath(requirements)):
-                self._requirements_file = os.path.normpath(requirements)
+               os.path.isfile(os.path.abspath(requirements)):
+                self._requirements_file = os.path.abspath(requirements)
                 self._requirements = None
             else:
                 if isinstance(self._requirements, str):
@@ -120,9 +121,8 @@ class Package(object):
             LOG.info('Skip Virtualenv set ... nothing to do')
             return
 
-        requirements_file = os.path.join(self._path, "requirements.txt")
         requirements_exist = \
-            self._requirements or os.path.isfile(requirements_file)
+            self._requirements or os.path.isfile(self._requirements_file)
         if self._virtualenv is None and requirements_exist:
             LOG.info('Building new virtualenv and installing requirements')
             self._build_new_virtualenv()
@@ -179,12 +179,12 @@ class Package(object):
             cmd = [os.path.join(self._pkg_venv, self._venv_pip),
                    'install'] + self._requirements
 
-        elif os.path.isfile(os.path.join(self._path, "requirements.txt")):
+        elif os.path.isfile(self._requirements_file):
             # Pip install
             LOG.debug("Installing requirements from requirements.txt file")
             cmd = [os.path.join(self._pkg_venv, self._venv_pip),
                    "install", "-r",
-                   os.path.join(self._path, "requirements.txt")]
+                   self._requirements_file]
 
         if cmd is not None:
             prc = Popen(cmd, stdout=PIPE, stderr=PIPE)
