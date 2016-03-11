@@ -67,7 +67,7 @@ def _execute(args):
     if args.requirements:
         requirements = path.abspath(args.requirements)
     pkg = package.build_package(pth, requirements,
-                                venv, cfg.ignore)
+                                venv, cfg.ignore, args.extra_files)
 
     if not args.no_clean:
         pkg.clean_workspace()

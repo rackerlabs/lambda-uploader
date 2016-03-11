@@ -27,9 +27,12 @@ ZIPFILE_NAME = 'lambda_function.zip'
 
 
 def build_package(path, requirements, virtualenv=None, ignore=[],
-                  zipfile_name=ZIPFILE_NAME):
+                  extra_files=[], zipfile_name=ZIPFILE_NAME):
     pkg = Package(path, zipfile_name)
 
+    if extra_files:
+        for fil in extra_files:
+            pkg.extra_file(fil)
     if virtualenv is not None:
         pkg.virtualenv(virtualenv)
     pkg.requirements(requirements)
