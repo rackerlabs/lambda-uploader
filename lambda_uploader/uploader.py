@@ -36,7 +36,7 @@ class PackageUploader(object):
     returns the package version
     '''
     def upload_existing(self, pkg):
-        self._validate_package_size(pkg.zipfile)
+        self._validate_package_size(pkg.zip_file)
         with open(pkg.zip_file, "rb") as fil:
             zip_file = fil.read()
 
@@ -77,7 +77,7 @@ class PackageUploader(object):
     returns the package version
     '''
     def upload_new(self, pkg):
-        self._validate_package_size(pkg.zipfile)
+        self._validate_package_size(pkg.zip_file)
         with open(pkg.zip_file, "rb") as fil:
             zip_file = fil.read()
 
