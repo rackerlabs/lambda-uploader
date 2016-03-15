@@ -60,9 +60,6 @@ def _execute(args):
         venv = None
 
     _print('Building Package')
-    for p in args.extra_files:
-        package.extra_file(p)
-
     requirements = cfg.requirements
     if args.requirements:
         requirements = path.abspath(args.requirements)
