@@ -21,8 +21,18 @@ import re
 LOG = logging.getLogger(__name__)
 
 
-def copy_tree(src, dest, ignore=[]):
+def copy_tree(src, dest, ignore=[], include_parent=False):
+    if os.path.isfile(src):
+        raise Exception('Cannot use copy_tree with a file as the src')
+
     LOG.info('Copying source files')
+    if include_parent:
+        # if src is foo, make dest/foo and copy files there
+        nested_dest = os.path.join(dest, os.path.basename(src))
+        os.makedirs(nested_dest)
+    else:
+        nested_dest = dest
+
     # Re-create directory structure
     for root, _, files in os.walk(src):
         for filename in files:
@@ -33,7 +43,7 @@ def copy_tree(src, dest, ignore=[]):
 
             sub_dirs = os.path.dirname(os.path.relpath(path,
                                                        start=src))
-            pkg_path = os.path.join(dest, sub_dirs)
+            pkg_path = os.path.join(nested_dest, sub_dirs)
             if not os.path.isdir(pkg_path):
                 os.makedirs(pkg_path)
 

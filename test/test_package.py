@@ -120,7 +120,7 @@ def test_package_with_extras():
     assert path.isfile(expected_extra_file1)
 
     # test a recursive directory
-    expected_extra_file2 = path.join(PACKAGE_TEMP_DIR, 'foo/__init__.py')
+    expected_extra_file2 = path.join(PACKAGE_TEMP_DIR, 'extra/foo/__init__.py')
     assert path.isfile(expected_extra_file2)
 
 

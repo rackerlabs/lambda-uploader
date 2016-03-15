@@ -228,12 +228,11 @@ class Package(object):
 
         for p in self._extra_files:
             LOG.info('Copying extra %s into package' % p)
+            ignore += ["%s" % p]
             if os.path.isdir(p):
-                utils.copy_tree(p, package)
-                ignore += ["^%s/*" % p]
+                utils.copy_tree(p, package, include_parent=True)
             else:
                 shutil.copy(p, package)
-                ignore += ["%s" % p]
 
         # Append the temp workspace to the ignore list:
         ignore += ["^%s/*" % TEMP_WORKSPACE_NAME]
