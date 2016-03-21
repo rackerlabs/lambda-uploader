@@ -63,8 +63,11 @@ def _execute(args):
     requirements = cfg.requirements
     if args.requirements:
         requirements = path.abspath(args.requirements)
+    extra_files = cfg.extra_files
+    if args.extra_files:
+        extra_files = args.extra_files
     pkg = package.build_package(pth, requirements,
-                                venv, cfg.ignore, args.extra_files)
+                                venv, cfg.ignore, extra_files)
 
     if not args.no_clean:
         pkg.clean_workspace()
