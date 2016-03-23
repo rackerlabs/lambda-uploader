@@ -18,10 +18,11 @@ from os import path
 REQUIRED_PARAMS = {u'name': basestring, u'description': basestring,
                    u'region': basestring, u'handler': basestring,
                    u'role': basestring, u'timeout': int, u'memory': int}
+REQUIRED_VPC_PARAMS = {u'subnets': list, u'security_groups': list}
 
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
-                  u'ignore': [], u'extra_files': []}
+                  u'ignore': [], u'extra_files': [], u'vpc': None}
 
 
 class Config(object):
@@ -32,6 +33,8 @@ class Config(object):
         if role is not None:
             self._config['role'] = role
         self._set_defaults()
+        if self._config['vpc']:
+            self._validate_vpc()
 
         for param, clss in REQUIRED_PARAMS.iteritems():
             self._validate(param, cls=clss)
@@ -78,10 +81,29 @@ class Config(object):
         if key not in self._config:
             raise ValueError("Config %s must have %s set"
                              % (self._path, key))
-            if cls:
-                if not isinstance(self._config[key], cls):
-                    raise TypeError("Config value '%s' should be %s not %s"
-                                    % (key, cls, type(self._config[key])))
+
+            return self._compare(key, cls, self._config[key])
+
+    '''Validate the VPC configuration'''
+    def _validate_vpc(self):
+        for param, clss in REQUIRED_VPC_PARAMS.iteritems():
+            self._compare(param, clss, self._config['vpc'].get(param))
+
+            if len(self._config['vpc'].get(param)) == 0:
+                raise TypeError("VPC Config '%s' should have at least"
+                                " one item in its array!" % param)
+            for value in self._config['vpc'].get(param):
+                if not isinstance(value, basestring):
+                    raise TypeError("VPC Config arrays can only contain"
+                                    " strings. '%s' contains something else"
+                                    % param)
+
+    '''Compare if a string is a certain type'''
+    def _compare(self, key, cls, value):
+        if cls:
+            if not isinstance(value, cls):
+                raise TypeError("Config value '%s' should be %s not %s"
+                                % (key, cls, type(value)))
 
     '''Load config ... called by init()'''
     def _load_config(self, lambda_file=None):

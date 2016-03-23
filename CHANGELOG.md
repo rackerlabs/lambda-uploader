@@ -14,6 +14,8 @@ lambda-uploader CHANGELOG
   variables in favor of calling setter methods.
 - Add -c shorthand to the --config flag
 - Fixed the ignores to match against paths relative to the source dir
+- Added support for placing your lambda functions in specific VPC 
+  subnets and security groups
 
 0.5.1
 -----

@@ -24,6 +24,7 @@ MAX_PACKAGE_SIZE = 50000000
 class PackageUploader(object):
     def __init__(self, config, profile_name):
         self._config = config
+        self._vpc_config = self._format_vpc_config()
         session = boto3.session.Session(region_name=config.region,
                                         profile_name=profile_name)
         self._client = session.client('lambda')
@@ -56,6 +57,7 @@ class PackageUploader(object):
             Description=self._config.description,
             Timeout=self._config.timeout,
             MemorySize=self._config.memory,
+            VpcConfig=self._vpc_config,
         )
         LOG.debug("AWS update_function_configuration response: %s"
                   % response)
@@ -92,6 +94,7 @@ class PackageUploader(object):
             Timeout=self._config.timeout,
             MemorySize=self._config.memory,
             Publish=self._config.publish,
+            VpcConfig=self._vpc_config,
         )
         LOG.debug("AWS create_function response: %s" % response)
 
@@ -171,3 +174,16 @@ class PackageUploader(object):
         '''
         if path.getsize(pkg) > MAX_PACKAGE_SIZE:
             LOG.warning("Size of your deployment package is larger than 50MB!")
+
+    def _format_vpc_config(self):
+        '''
+        Returns {} if the VPC config is set to None by Config,
+        returns the formatted config otherwise
+        '''
+        if self._config.raw['vpc']:
+            return {
+                'SubnetIds': self._config.raw['vpc']['subnets'],
+                'SecurityGroupIds': self._config.raw['vpc']['security_groups']
+            }
+        else:
+            return {}

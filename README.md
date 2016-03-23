@@ -20,6 +20,10 @@ The lambda uploader expects a directory with, at a minimum, your lambda function
 and a lambda.json file.  It is not necessary to set requirements in your config
 file since the lambda uploader will also check for and use a requirements.txt file.
 
+Please note that you can leave the "vpc" object out of your config if you want your
+lambda function to use your default VPC and subnets. If you wish to use your lambda
+function inside a specific VPC, make sure you set up the role correctly to allow this.
+
 Example lambda.json file:
 ```json
 {
@@ -35,7 +39,15 @@ Example lambda.json file:
     "/*.pyc"
   ],
   "timeout": 30,
-  "memory": 512
+  "memory": 512,
+  "vpc": {
+    "subnets": [
+      "subnet-00000000"
+    ],
+    "security_groups": [
+      "sg-00000000"
+    ]
+  }
 }
 ```
 
