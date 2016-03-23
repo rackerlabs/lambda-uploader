@@ -5,7 +5,7 @@ import re
 from setuptools import setup, find_packages
 
 DEPENDENCIES = [
-    'boto3==1.2.2',
+    'boto3==1.3.0',
     'virtualenv',
 ]
 
