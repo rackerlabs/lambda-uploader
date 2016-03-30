@@ -20,3 +20,11 @@ def test_s3_upload():
     upldr = uploader.PackageUploader(conf, None)
 
     upldr._upload_s3(path.join(path.dirname(__file__), 'dummyfile'))
+
+    # fetch the contents back out, be sure we truly uploaded the dummyfile
+    retrieved_bucket = conn.Object(
+        mock_bucket,
+        conf.s3_package_name()
+        ).get()['Body']
+    found_contents = str(retrieved_bucket.read()).rstrip()
+    assert found_contents == 'dummy data'
