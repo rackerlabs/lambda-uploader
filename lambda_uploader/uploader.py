@@ -22,12 +22,13 @@ MAX_PACKAGE_SIZE = 50000000
 
 
 class PackageUploader(object):
+    '''TODO: Should we decouple the config from the Object Init'''
     def __init__(self, config, profile_name):
         self._config = config
         self._vpc_config = self._format_vpc_config()
-        session = boto3.session.Session(region_name=config.region,
-                                        profile_name=profile_name)
-        self._client = session.client('lambda')
+        self._aws_session = boto3.session.Session(region_name=config.region,
+                                                  profile_name=profile_name)
+        self._lambda_client = self._aws_session.client('lambda')
         self.version = None
 
     '''
@@ -42,15 +43,25 @@ class PackageUploader(object):
             zip_file = fil.read()
 
         LOG.debug('running update_function_code')
-        conf_update_resp = self._client.update_function_code(
-            FunctionName=self._config.name,
-            ZipFile=zip_file,
-            Publish=False,
-        )
+        conf_update_resp = None
+        if self._config.s3_bucket:
+            self._upload_s3(pkg.zip_file)
+            conf_update_resp = self._lambda_client.update_function_code(
+                FunctionName=self._config.name,
+                S3Bucket=self._config.s3_bucket,
+                S3Key=self._config.s3_package_name(),
+                Publish=False,
+            )
+        else:
+            conf_update_resp = self._lambda_client.update_function_code(
+                FunctionName=self._config.name,
+                ZipFile=zip_file,
+                Publish=False,
+            )
         LOG.debug("AWS update_function_code response: %s"
                   % conf_update_resp)
         LOG.debug('running update_function_configuration')
-        response = self._client.update_function_configuration(
+        response = self._lambda_client.update_function_configuration(
             FunctionName=self._config.name,
             Handler=self._config.handler,
             Role=self._config.role,
@@ -65,7 +76,7 @@ class PackageUploader(object):
         version = response.get('Version')
         # Publish the version after upload and config update if needed
         if self._config.publish:
-            resp = self._client.publish_version(
+            resp = self._lambda_client.publish_version(
                     FunctionName=self._config.name,
                     )
             LOG.debug("AWS publish_version response: %s" % resp)
@@ -79,17 +90,24 @@ class PackageUploader(object):
     returns the package version
     '''
     def upload_new(self, pkg):
-        self._validate_package_size(pkg.zip_file)
-        with open(pkg.zip_file, "rb") as fil:
-            zip_file = fil.read()
+        code = {}
+        if self._config.s3_bucket:
+            code = {'S3Bucket': self._config.s3_bucket,
+                    'S3Key': self._config.s3_package_name()}
+            self._upload_s3(pkg.zip_file)
+        else:
+            self._validate_package_size(pkg.zip_file)
+            with open(pkg.zip_file, "rb") as fil:
+                zip_file = fil.read()
+            code = {'ZipFile': zip_file}
 
         LOG.debug('running create_function_code')
-        response = self._client.create_function(
+        response = self._lambda_client.create_function(
             FunctionName=self._config.name,
             Runtime='python2.7',
             Handler=self._config.handler,
             Role=self._config.role,
-            Code={'ZipFile': zip_file},
+            Code=code,
             Description=self._config.description,
             Timeout=self._config.timeout,
             MemorySize=self._config.memory,
@@ -107,7 +125,7 @@ class PackageUploader(object):
     def upload(self, pkg):
         existing_function = True
         try:
-            get_resp = self._client.get_function_configuration(
+            get_resp = self._lambda_client.get_function_configuration(
                     FunctionName=self._config.name)
             LOG.debug("AWS get_function_configuration response: %s" % get_resp)
         except:
@@ -138,7 +156,7 @@ class PackageUploader(object):
     an alias exists.
     '''
     def _alias_exists(self):
-        resp = self._client.list_aliases(
+        resp = self._lambda_client.list_aliases(
                 FunctionName=self._config.name)
 
         for alias in resp.get('Aliases'):
@@ -149,7 +167,7 @@ class PackageUploader(object):
     '''Creates alias'''
     def _create_alias(self):
         LOG.debug("Creating new alias %s" % self._config.alias)
-        resp = self._client.create_alias(
+        resp = self._lambda_client.create_alias(
                 FunctionName=self._config.name,
                 Name=self._config.alias,
                 FunctionVersion=self.version,
@@ -160,7 +178,7 @@ class PackageUploader(object):
     '''Update alias'''
     def _update_alias(self):
         LOG.debug("Updating alias %s" % self._config.alias)
-        resp = self._client.update_alias(
+        resp = self._lambda_client.update_alias(
                 FunctionName=self._config.name,
                 Name=self._config.alias,
                 FunctionVersion=self.version,
@@ -187,3 +205,12 @@ class PackageUploader(object):
             }
         else:
             return {}
+
+    def _upload_s3(self, zip_file):
+        '''
+        Uploads the lambda package to s3
+        '''
+        s3_client = self._aws_session.client('s3')
+        transfer = boto3.s3.transfer.S3Transfer(s3_client)
+        transfer.upload_file(zip_file, self._config.s3_bucket,
+                             self._config.s3_package_name())

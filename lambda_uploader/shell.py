@@ -49,6 +49,9 @@ def _execute(args):
 
     cfg = config.Config(pth, args.config, role=args.role)
 
+    if args.s3_bucket:
+        cfg.set_s3(args.s3_bucket, args.s3_key)
+
     if args.no_virtualenv:
         # specified flag to omit entirely
         venv = False
@@ -142,6 +145,12 @@ def main(arv=None):
                         default=None, help=alias_help)
     parser.add_argument('--alias-description', '-m', dest='alias_description',
                         default=None, help='alias description')
+    parser.add_argument('--s3-bucket', '-s', dest='s3_bucket',
+                        help='S3 bucket to store the lambda function in',
+                        default=None)
+    parser.add_argument('--s3-key', '-k', dest='s3_key',
+                        help='Key name of the lambda function s3 object',
+                        default=None)
     parser.add_argument('--config', '-c', help='Overrides lambda.json',
                         default='lambda.json')
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
