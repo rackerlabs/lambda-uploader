@@ -54,3 +54,9 @@ def test_set_publish():
 
     cfg.set_publish()
     assert cfg.publish
+
+
+def test___getattr__():
+    cfg = config.Config(EX_CONFIG, EX_CONFIG + '/lambda.json')
+    assert cfg.s3_bucket is None
+    assert cfg.name == 'myFunc'

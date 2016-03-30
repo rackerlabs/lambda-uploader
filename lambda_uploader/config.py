@@ -22,7 +22,8 @@ REQUIRED_VPC_PARAMS = {u'subnets': list, u'security_groups': list}
 
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
-                  u'ignore': [], u'extra_files': [], u'vpc': None}
+                  u'ignore': [], u'extra_files': [], u'vpc': None,
+                  u's3_bucket': None, u's3_key': None}
 
 
 class Config(object):
@@ -59,6 +60,14 @@ class Config(object):
             return self._config['description']
         else:
             return self._config['alias_description']
+
+    '''
+    Public method to set the S3 bucket and keyname
+    '''
+    def set_s3(self, bucket, key=None):
+        self._config['s3_bucket'] = bucket
+        if key:
+            self._config['s3_key'] = key
 
     '''Set the publish attr to true'''
     def set_publish(self):
@@ -105,6 +114,11 @@ class Config(object):
                 raise TypeError("Config value '%s' should be %s not %s"
                                 % (key, cls, type(value)))
 
+    def s3_package_name(self):
+        if self._config.get('s3_key'):
+            return self.s3_key
+        return self.name + '.zip'
+
     '''Load config ... called by init()'''
     def _load_config(self, lambda_file=None):
         if not lambda_file:
@@ -117,8 +131,7 @@ class Config(object):
             self._config = json.load(config_file)
 
     def __getattr__(self, key):
-        val = self._config.get(key)
-        if val is not None:
-            return val
+        if key in self._config:
+            return self._config[key]
         else:
             return object.__getattribute__(self, key)

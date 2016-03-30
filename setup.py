@@ -13,6 +13,7 @@ TESTS_REQUIRE = [
     'pylint==1.4.1',
     'flake8==2.3.0',
     'pytest==2.8.2',
+    'moto==0.4.23',
 ]
 
 
