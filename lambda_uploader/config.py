@@ -124,8 +124,8 @@ class Config(object):
         if not lambda_file:
             lambda_file = path.join(self._path, 'lambda.json')
 
-        if not path.isfile(lambda_file):
-            raise Exception("%s not found" % lambda_file)
+        if not path.isfile(lambda_file) or path.isdir(lambda_file):
+            raise Exception("%s not a valid configuration file" % lambda_file)
 
         with open(lambda_file) as config_file:
             self._config = json.load(config_file)
