@@ -14,6 +14,7 @@
 
 import boto3
 import logging
+import hashlib
 
 from os import path
 
@@ -210,7 +211,34 @@ class PackageUploader(object):
         '''
         Uploads the lambda package to s3
         '''
+
         s3_client = self._aws_session.client('s3')
+
+        shasum = hashlib.new('sha256')
+        with open(zip_file, "r") as fil:
+            shasum.update(fil.read())
+
+        local_checksum = shasum.hexdigest()
+        LOG.debug('Zipfile hash: ' + local_checksum)
+        remote_checksum = None
+        try:
+            resp = s3_client.head_object(Bucket=self._config.s3_bucket,
+                                         Key=self._config.s3_package_name())
+            metadata = resp.get('Metadata')
+            if metadata:
+                remote_checksum = metadata.get('sha256sum')
+                LOG.debug('Remote hash: ' + remote_checksum)
+        except Exception as e:
+            # Ignore the exception if it was a 404
+            if 'Not Found' not in str(e):
+                raise e
+
+        if local_checksum == remote_checksum:
+            LOG.info('Package in S3 is up to date ... skipping')
+            return
         transfer = boto3.s3.transfer.S3Transfer(s3_client)
         transfer.upload_file(zip_file, self._config.s3_bucket,
-                             self._config.s3_package_name())
+                             self._config.s3_package_name(),
+                             extra_args={'Metadata': {
+                                            'sha256sum': shasum.hexdigest()}})
+
