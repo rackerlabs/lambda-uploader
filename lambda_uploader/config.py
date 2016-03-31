@@ -121,10 +121,13 @@ class Config(object):
 
     '''Load config ... called by init()'''
     def _load_config(self, lambda_file=None):
+        if not path.isdir(self._path):
+            raise Exception("%s not a valid function directory" % self._path)
+
         if not lambda_file:
             lambda_file = path.join(self._path, 'lambda.json')
 
-        if not path.isfile(lambda_file) or path.isdir(lambda_file):
+        if not path.isfile(lambda_file):
             raise Exception("%s not a valid configuration file" % lambda_file)
 
         with open(lambda_file) as config_file:

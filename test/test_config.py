@@ -1,5 +1,6 @@
 from os import path
 from lambda_uploader import config
+import pytest
 
 EX_CONFIG = path.normpath(path.join(path.dirname(__file__),
                           '../test/configs'))
@@ -57,6 +58,35 @@ def test_set_publish():
 
 
 def test___getattr__():
-    cfg = config.Config(EX_CONFIG, EX_CONFIG + '/lambda.json')
+    cfg = config.Config(EX_CONFIG, path.join(EX_CONFIG, 'lambda.json'))
     assert cfg.s3_bucket is None
     assert cfg.name == 'myFunc'
+
+
+def test_invalid_config_as_dir():
+    # pass the function directory as the lambda configuration --
+    # this should not work!
+    with pytest.raises(Exception):
+        config.Config(EX_CONFIG, EX_CONFIG)
+
+
+def test_invalid_config_missing_file():
+    # try invalid file
+    with pytest.raises(Exception):
+        config.Config(EX_CONFIG, path.join(EX_CONFIG, 'pleasedontexist.json'))
+
+
+def test_invalid_config_missing_function_dir():
+    # try invalid file
+    with pytest.raises(Exception):
+        config.Config(path.join(EX_CONFIG, 'pleasedontexist_dir'))
+
+
+def test_invalid_config_missing_function_dir2():
+    with pytest.raises(Exception):
+        config.Config(
+            # invalid function dir
+            path.join(EX_CONFIG, 'pleasedontexist_dir'),
+            # valid config file
+            path.join(EX_CONFIG, 'lambda.json')
+        )
