@@ -47,11 +47,45 @@ def _print(txt):
 def _execute(args):
     pth = path.abspath(args.function_dir)
 
-    cfg = config.Config(pth, args.config, role=args.role)
+    pkg = None
+    configs = args.config.split(',')
+    for conf in configs:
+        cfg = config.Config(pth, conf, role=args.role)
 
-    if args.s3_bucket:
-        cfg.set_s3(args.s3_bucket, args.s3_key)
+        if args.s3_bucket:
+            cfg.set_s3(args.s3_bucket, args.s3_key)
 
+        # Only create the package if it doesn't already exist
+        if not pkg:
+            pkg = _package(pth, args, cfg)
+            if not args.no_clean:
+                pkg.clean_workspace()
+
+        if not args.no_upload:
+            # Set publish if flagged to do so
+            if args.publish:
+                cfg.set_publish()
+
+            create_alias = False
+            # Set alias if the arg is passed
+            if args.alias is not None:
+                cfg.set_alias(args.alias, args.alias_description)
+                create_alias = True
+
+            output = "Updating Lambda Function {}".format(cfg.name)
+            _print(output)
+            upldr = uploader.PackageUploader(cfg, args.profile)
+            upldr.upload(pkg)
+            # If the alias was set create it
+            if create_alias:
+                upldr.alias()
+
+    if not args.no_clean:
+        pkg.clean_zipfile()
+    _print('Fin')
+
+
+def _package(function_path, args, cfg):
     if args.no_virtualenv:
         # specified flag to omit entirely
         venv = False
@@ -69,33 +103,8 @@ def _execute(args):
     extra_files = cfg.extra_files
     if args.extra_files:
         extra_files = args.extra_files
-    pkg = package.build_package(pth, requirements,
-                                venv, cfg.ignore, extra_files)
-
-    if not args.no_clean:
-        pkg.clean_workspace()
-
-    if not args.no_upload:
-        # Set publish if flagged to do so
-        if args.publish:
-            cfg.set_publish()
-
-        create_alias = False
-        # Set alias if the arg is passed
-        if args.alias is not None:
-            cfg.set_alias(args.alias, args.alias_description)
-            create_alias = True
-
-        _print('Uploading Package')
-        upldr = uploader.PackageUploader(cfg, args.profile)
-        upldr.upload(pkg)
-        # If the alias was set create it
-        if create_alias:
-            upldr.alias()
-
-        pkg.clean_zipfile()
-
-    _print('Fin')
+    return package.build_package(function_path, requirements,
+                                 venv, cfg.ignore, extra_files)
 
 
 def main(arv=None):
@@ -151,7 +160,9 @@ def main(arv=None):
     parser.add_argument('--s3-key', '-k', dest='s3_key',
                         help='Key name of the lambda function s3 object',
                         default=None)
-    parser.add_argument('--config', '-c', help='Overrides lambda.json',
+    config_help = 'lambda-uploader config, can be a comma delimted list'
+    parser.add_argument('--config', '-c', dest='config',
+                        help=config_help,
                         default='lambda.json')
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
                         help='lambda function directory')
