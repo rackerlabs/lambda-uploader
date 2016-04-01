@@ -21,12 +21,19 @@ import sys
 from subprocess import Popen, PIPE
 from lambda_uploader import utils
 
+# Python 2/3 compatability
+try:
+    basestring
+except NameError:
+    basestring = str
+
+
 LOG = logging.getLogger(__name__)
 TEMP_WORKSPACE_NAME = ".lambda_uploader_temp"
 ZIPFILE_NAME = 'lambda_function.zip'
 
 
-def build_package(path, requirements, virtualenv=None, ignore=[],
+def build_package(path, requires, virtualenv=None, ignore=[],
                   extra_files=[], zipfile_name=ZIPFILE_NAME):
     pkg = Package(path, zipfile_name)
 
@@ -35,7 +42,7 @@ def build_package(path, requirements, virtualenv=None, ignore=[],
             pkg.extra_file(fil)
     if virtualenv is not None:
         pkg.virtualenv(virtualenv)
-    pkg.requirements(requirements)
+    pkg.requirements(requires)
     pkg.build(ignore)
 
     return pkg
@@ -70,25 +77,25 @@ class Package(object):
         if os.path.isfile(self.zip_file):
             os.remove(self.zip_file)
 
-    def requirements(self, requirements):
+    def requirements(self, requires):
         '''
         Sets the requirements for the package.
 
         It will take either a valid path to a requirements file or
         a list of requirements.
         '''
-        if requirements:
-            if isinstance(requirements, str) and \
-               os.path.isfile(os.path.abspath(requirements)):
-                self._requirements_file = os.path.abspath(requirements)
+        if requires:
+            if isinstance(requires, basestring) and \
+               os.path.isfile(os.path.abspath(requires)):
+                self._requirements_file = os.path.abspath(requires)
                 self._requirements = None
             else:
-                if isinstance(self._requirements, str):
-                    requirements = requirements.split()
+                if isinstance(self._requirements, basestring):
+                    requires = requires.split()
                 self._requirements_file = None
-                self._requirements = requirements
+                self._requirements = requires
         else:
-            self._requirements, self._requirements_file = None
+            self._requirements, self._requirements_file = None, None
 
     def virtualenv(self, virtualenv):
         '''
@@ -124,13 +131,12 @@ class Package(object):
             LOG.info('Skip Virtualenv set ... nothing to do')
             return
 
-        requirements_exist = \
-            self._requirements or os.path.isfile(self._requirements_file)
-        if self._virtualenv is None and requirements_exist:
+        has_reqs = _isfile(self._requirements_file) or self._requirements
+        if self._virtualenv is None and has_reqs:
             LOG.info('Building new virtualenv and installing requirements')
             self._build_new_virtualenv()
             self._install_requirements()
-        elif self._virtualenv is None and not requirements_exist:
+        elif self._virtualenv is None and not has_reqs:
             LOG.info('No requirements found, so no virtualenv will be made')
             self._pkg_venv = False
         else:
@@ -182,7 +188,7 @@ class Package(object):
             cmd = [os.path.join(self._pkg_venv, self._venv_pip),
                    'install'] + self._requirements
 
-        elif os.path.isfile(self._requirements_file):
+        elif _isfile(self._requirements_file):
             # Pip install
             LOG.debug("Installing requirements from requirements.txt file")
             cmd = [os.path.join(self._pkg_venv, self._venv_pip),
@@ -252,3 +258,10 @@ class Package(object):
 
                 zf.write(absname, arcname)
         zf.close()
+
+
+def _isfile(path):
+    """Variant of os.path.isfile that is somewhat type-resilient."""
+    if not path:
+        return False
+    return os.path.isfile(path)
