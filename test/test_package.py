@@ -67,6 +67,22 @@ def test_install_requirements():
     assert path.isdir(path.join(site_packages, '_pytest'))
 
 
+def test_install_no_requirements():
+    temp_workspace = path.join(TESTING_TEMP_DIR,
+                               package.TEMP_WORKSPACE_NAME)
+
+    pkg = package.Package(TESTING_TEMP_DIR)
+    pkg.requirements([])
+    pkg.install_dependencies()
+
+    site_packages = path.join(temp_workspace,
+                              'venv/lib/python2.7/site-packages')
+    if sys.platform == 'win32' or sys.platform == 'cygwin':
+        site_packages = path.join(temp_workspace, "venv\\lib\\site-packages")
+
+    assert path.isdir(path.join(site_packages, '_pytest'))
+
+
 def test_default_virtualenv():
     temp_workspace = path.join(TESTING_TEMP_DIR,
                                package.TEMP_WORKSPACE_NAME)
