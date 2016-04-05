@@ -15,6 +15,12 @@
 import json
 from os import path
 
+# Python 2/3 compatability
+try:
+    basestring
+except NameError:
+    basestring = str
+
 REQUIRED_PARAMS = {u'name': basestring, u'description': basestring,
                    u'region': basestring, u'handler': basestring,
                    u'role': basestring, u'timeout': int, u'memory': int}
@@ -37,7 +43,7 @@ class Config(object):
         if self._config['vpc']:
             self._validate_vpc()
 
-        for param, clss in REQUIRED_PARAMS.iteritems():
+        for param, clss in REQUIRED_PARAMS.items():
             self._validate(param, cls=clss)
 
     '''
@@ -81,7 +87,7 @@ class Config(object):
 
     '''Set all defaults after loading the config'''
     def _set_defaults(self):
-        for param, val in DEFAULT_PARAMS.iteritems():
+        for param, val in DEFAULT_PARAMS.items():
             if self._config.get(param) is None:
                 self._config[param] = val
 
@@ -95,7 +101,7 @@ class Config(object):
 
     '''Validate the VPC configuration'''
     def _validate_vpc(self):
-        for param, clss in REQUIRED_VPC_PARAMS.iteritems():
+        for param, clss in REQUIRED_VPC_PARAMS.items():
             self._compare(param, clss, self._config['vpc'].get(param))
 
             if len(self._config['vpc'].get(param)) == 0:

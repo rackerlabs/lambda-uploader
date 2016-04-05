@@ -24,7 +24,7 @@ TEST_IGNORE = [
     # The one below would exclude all the files if files to be ignored were
     # matched based on the full path, rather than the path relative to the
     # source directory, since the source directory contains 'test' in its path.
-    'test',
+    'tests',
 ]
 
 

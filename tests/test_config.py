@@ -3,7 +3,7 @@ from lambda_uploader import config
 import pytest
 
 EX_CONFIG = path.normpath(path.join(path.dirname(__file__),
-                          '../test/configs'))
+                          '../tests/configs'))
 
 
 def test_load_config():
@@ -14,7 +14,7 @@ def test_load_config():
              'description': 'myfunc',
              'region': 'us-east-1'}
 
-    for key, val in attrs.iteritems():
+    for key, val in attrs.items():
         assert cfg.raw[key] == val
 
 
