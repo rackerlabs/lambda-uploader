@@ -127,8 +127,8 @@ def test_package():
 
 def test_package_with_extras():
     pkg = package.Package(TESTING_TEMP_DIR)
-    pkg.extra_file(path.join('test', 'extra'))
-    pkg.extra_file(path.join('test', 'dummyfile'))
+    pkg.extra_file(path.join('tests', 'extra'))
+    pkg.extra_file(path.join('tests', 'dummyfile'))
     pkg.package()
 
     # test a single file

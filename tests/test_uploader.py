@@ -3,9 +3,10 @@ import boto3
 from os import path
 from lambda_uploader import uploader, config
 from moto import mock_s3
+from platform import python_version
 
 EX_CONFIG = path.normpath(path.join(path.dirname(__file__),
-                          '../test/configs'))
+                          '../tests/configs'))
 
 
 @mock_s3
@@ -27,4 +28,7 @@ def test_s3_upload():
         conf.s3_package_name()
         ).get()['Body']
     found_contents = str(retrieved_bucket.read()).rstrip()
-    assert found_contents == 'dummy data'
+    if python_version() < '3.0.0':
+        assert found_contents == 'dummy data'
+    else:
+        assert found_contents == "b'dummy data\\n'"

@@ -20,6 +20,7 @@ import sys
 
 from subprocess import Popen, PIPE
 from lambda_uploader import utils
+from distutils.spawn import find_executable
 
 # Python 2/3 compatability
 try:
@@ -160,8 +161,8 @@ class Package(object):
             if sys.platform == 'win32' or sys.platform == 'cygwin':
                 self._venv_pip = 'Scripts\pip.exe'
 
-            proc = Popen(["virtualenv", self._pkg_venv],
-                         stdout=PIPE, stderr=PIPE)
+            proc = Popen(["virtualenv", "-p", _python_executable(),
+                          self._pkg_venv], stdout=PIPE, stderr=PIPE)
             stdout, stderr = proc.communicate()
             LOG.debug("Virtualenv stdout: %s" % stdout)
             LOG.debug("Virtualenv stderr: %s" % stderr)
@@ -265,3 +266,14 @@ def _isfile(path):
     if not path:
         return False
     return os.path.isfile(path)
+
+
+def _python_executable():
+        python_exe = find_executable('python2')
+        if python_exe is '':
+            python_exe = find_executable('python')
+
+        if python_exe is '':
+            raise Exception('Unable to locate python executable')
+
+        return python_exe

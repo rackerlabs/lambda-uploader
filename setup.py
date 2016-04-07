@@ -4,17 +4,31 @@ import ast
 import re
 from setuptools import setup, find_packages
 
-DEPENDENCIES = [
+INSTALL_REQUIRES = [
     'boto3==1.3.0',
     'virtualenv',
 ]
 
-TESTS_REQUIRE = [
-    'pylint==1.4.1',
-    'flake8==2.3.0',
-    'pytest==2.8.2',
-    'moto==0.4.23',
+STYLE_REQUIRES = [
+    'flake8>=2.5.4',
+    'pylint>=1.5.5',
 ]
+
+
+TEST_REQUIRES = [
+    'coverage>=4.0.3',
+    'pytest>=2.9.1',
+    'moto>=0.4.23',
+]
+
+
+EXTRAS_REQUIRE = {
+    'test': TEST_REQUIRES,
+    'style': STYLE_REQUIRES,
+    # alias
+    'lint': STYLE_REQUIRES,
+    'test-requirements': TEST_REQUIRES + STYLE_REQUIRES,
+}
 
 
 def package_meta():
@@ -46,11 +60,16 @@ setup(
     description='AWS Python Lambda Packager',
     keywords='aws lambda',
     version=_lu_meta['version'],
-    tests_require=TESTS_REQUIRE,
-    install_requires=DEPENDENCIES,
+    extras_require=EXTRAS_REQUIRE,
+    tests_require=TEST_REQUIRES + STYLE_REQUIRES,
+    install_requires=INSTALL_REQUIRES,
     packages=find_packages(exclude=['tests']),
+    test_suite='tests',
     classifiers=[
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
     ],
     license=_lu_meta['license'],
     author="Rackers",
