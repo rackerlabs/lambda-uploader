@@ -272,10 +272,10 @@ def _isfile(path):
 
 def _python_executable():
         python_exe = find_executable('python2')
-        if python_exe is '':
+        if not python_exe:
             python_exe = find_executable('python')
 
-        if python_exe is '':
+        if not python_exe:
             raise Exception('Unable to locate python executable')
 
         return python_exe
