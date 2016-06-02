@@ -100,16 +100,17 @@ def _execute(args):
 
 def main(arv=None):
     """lambda-uploader command line interface."""
-    # Check for Python 2.7 (required for Lambda)
-    if not (sys.version_info[0] == 2 and sys.version_info[1] == 7):
-        raise RuntimeError('lambda-uploader requires Python 2.7')
+    # Check for Python 2.7 or later
+    if sys.version_info[0] < 3 and not sys.version_info[1] == 7:
+        raise RuntimeError('lambda-uploader requires Python 2.7 or later')
 
     import argparse
 
     parser = argparse.ArgumentParser(
-            version=('version %s' % lambda_uploader.__version__),
             description='Simple way to create and upload python lambda jobs')
 
+    parser.add_argument('--version', '-v', action='version',
+                        version=lambda_uploader.__version__)
     parser.add_argument('--no-upload', dest='no_upload',
                         action='store_const', help='dont upload the zipfile',
                         const=True)
