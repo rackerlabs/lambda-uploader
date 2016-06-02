@@ -89,13 +89,15 @@ class Package(object):
             if isinstance(requires, basestring) and \
                os.path.isfile(os.path.abspath(requires)):
                 self._requirements_file = os.path.abspath(requires)
-                self._requirements = None
             else:
                 if isinstance(self._requirements, basestring):
                     requires = requires.split()
                 self._requirements_file = None
                 self._requirements = requires
         else:
+            # If the default requirements file is found use that
+            if os.path.isfile(self._requirements_file):
+                return
             self._requirements, self._requirements_file = None, None
 
     def virtualenv(self, virtualenv):
