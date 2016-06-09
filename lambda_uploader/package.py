@@ -235,17 +235,19 @@ class Package(object):
                 LOG.info('Copying lib64 site packages')
                 utils.copy_tree(lib64_path, package)
 
+        # Append the temp workspace to the ignore list:
+        ignore += ["^%s/*" % TEMP_WORKSPACE_NAME]
+        utils.copy_tree(self._path, package, ignore)
+
+        # Add extra files
         for p in self._extra_files:
             LOG.info('Copying extra %s into package' % p)
             ignore += ["%s" % p]
             if os.path.isdir(p):
-                utils.copy_tree(p, package, include_parent=True)
+                utils.copy_tree(p, package, ignore=ignore, include_parent=True)
             else:
                 shutil.copy(p, package)
 
-        # Append the temp workspace to the ignore list:
-        ignore += ["^%s/*" % TEMP_WORKSPACE_NAME]
-        utils.copy_tree(self._path, package, ignore)
         self._create_zip(package)
 
     def _create_zip(self, src):
