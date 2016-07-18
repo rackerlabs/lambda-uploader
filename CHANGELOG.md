@@ -1,8 +1,17 @@
 lambda-uploader CHANGELOG
 =========================
 
-1.0.0(Unreleased)
------------------
+1.0.1
+-----
+- Fixed exceptions caused by not handling find_executable() returning
+  None
+- No longer raising exception in shell if Python version is Python 3
+- Fixed issue with default requirements file not being used if it
+  exists in the project directory
+- Ignore list now applies to extra files as well
+
+1.0.0
+-----
 - Warn if the lambda package is over the current AWS max size of 50MB
 - Add --extra-file flag for adding arbitrary file(s) outside of the
   project directory.
