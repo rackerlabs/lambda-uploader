@@ -5,7 +5,7 @@ import re
 from setuptools import setup, find_packages
 
 INSTALL_REQUIRES = [
-    'boto3==1.3.0',
+    'boto3==1.4.0',
     'virtualenv',
 ]
 
