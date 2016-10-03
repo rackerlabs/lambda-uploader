@@ -1,6 +1,10 @@
 lambda-uploader CHANGELOG
 =========================
 
+1.0.2
+-----
+- Bumped the boto3 version to 1.4.0
+
 1.0.1
 -----
 - Fixed exceptions caused by not handling find_executable() returning
