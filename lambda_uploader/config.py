@@ -97,7 +97,7 @@ class Config(object):
             raise ValueError("Config %s must have %s set"
                              % (self._path, key))
 
-            return self._compare(key, cls, self._config[key])
+        return self._compare(key, cls, self._config[key])
 
     '''Validate the VPC configuration'''
     def _validate_vpc(self):
