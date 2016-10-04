@@ -1,6 +1,13 @@
 lambda-uploader CHANGELOG
 =========================
 
+1.0.3
+-----
+- Fixed issue in copy trees attempting to make a parent directory even
+  if it already exists.
+- Fixed issue in configuration verify where the object was not actually
+  checked.
+
 1.0.2
 -----
 - Bumped the boto3 version to 1.4.0
