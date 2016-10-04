@@ -28,8 +28,10 @@ def copy_tree(src, dest, ignore=[], include_parent=False):
     LOG.info('Copying source files')
     if include_parent:
         # if src is foo, make dest/foo and copy files there
-        nested_dest = os.path.join(dest, os.path.basename(src))
-        os.makedirs(nested_dest)
+        nested_dest = os.path.normpath(
+                os.path.join(dest, os.path.basename(src)))
+        if not os.path.isdir(nested_dest):
+            os.makedirs(nested_dest)
     else:
         nested_dest = dest
 
