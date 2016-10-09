@@ -90,3 +90,10 @@ def test_invalid_config_missing_function_dir2():
             # valid config file
             path.join(EX_CONFIG, 'lambda.json')
         )
+
+def test_default_runtime():
+    cfg = config.Config(EX_CONFIG)
+    assert cfg.runtime == 'python2.7'
+
+    cfg.set_runtime('java8')
+    assert cfg.runtime == 'java8'

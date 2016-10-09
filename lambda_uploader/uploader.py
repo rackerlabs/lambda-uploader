@@ -104,7 +104,7 @@ class PackageUploader(object):
         LOG.debug('running create_function_code')
         response = self._lambda_client.create_function(
             FunctionName=self._config.name,
-            Runtime='python2.7',
+            Runtime=self._config.runtime,
             Handler=self._config.handler,
             Role=self._config.role,
             Code=code,
