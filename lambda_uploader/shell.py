@@ -62,15 +62,18 @@ def _execute(args):
         # build and include virtualenv, the default
         venv = None
 
-    _print('Building Package')
-    requirements = cfg.requirements
-    if args.requirements:
-        requirements = path.abspath(args.requirements)
-    extra_files = cfg.extra_files
-    if args.extra_files:
-        extra_files = args.extra_files
-    pkg = package.build_package(pth, requirements,
-                                venv, cfg.ignore, extra_files)
+    if args.no_build:
+        pkg = package.create_package(pth)
+    else:
+        _print('Building Package')
+        requirements = cfg.requirements
+        if args.requirements:
+            requirements = path.abspath(args.requirements)
+        extra_files = cfg.extra_files
+        if args.extra_files:
+            extra_files = args.extra_files
+        pkg = package.build_package(pth, requirements,
+                                    venv, cfg.ignore, extra_files)
 
     if not args.no_clean:
         pkg.clean_workspace()
@@ -156,6 +159,9 @@ def main(arv=None):
                         default='lambda.json')
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
                         help='lambda function directory')
+    parser.add_argument('--no-build', dest='no_build',
+                        action='store_const', help='dont build the sourcecode',
+                        const=True)
 
     verbose = parser.add_mutually_exclusive_group()
     verbose.add_argument('-V', dest='loglevel', action='store_const',

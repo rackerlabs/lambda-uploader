@@ -49,6 +49,11 @@ def build_package(path, requires, virtualenv=None, ignore=[],
     return pkg
 
 
+def create_package(path, zipfile_name=ZIPFILE_NAME):
+    pkg = Package(path, zipfile_name)
+    return pkg
+
+
 class Package(object):
     def __init__(self, path, zipfile_name=ZIPFILE_NAME):
         self._path = path

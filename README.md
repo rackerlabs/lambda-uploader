@@ -95,3 +95,9 @@ function description will be used when an alias-description is not provided.
 ```shell
 lambda-uploader --alias myAlias --alias-description 'My alias description' ./myfunc
 ```
+
+If you would prefer to build the package manually and just upload it using uploader you can ignore the build.
+This will upload `lambda_function.zip` file.
+```shell
+lambda-uploader --no-build
+```
