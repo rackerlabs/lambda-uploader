@@ -125,6 +125,9 @@ def main(arv=None):
     parser.add_argument('--virtualenv', '-e',
                         help='use specified virtualenv instead of making one',
                         default=None)
+    parser.add_argument('--region', dest='region',
+                        help='Region to upload lambda function to',
+                        const=True)
     parser.add_argument('--extra-files', '-x',
                         action='append',
                         help='include file or directory path in package',

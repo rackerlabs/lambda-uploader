@@ -22,23 +22,25 @@ except NameError:
     basestring = str
 
 REQUIRED_PARAMS = {u'name': basestring, u'description': basestring,
-                   u'region': basestring, u'handler': basestring,
-                   u'role': basestring, u'timeout': int, u'memory': int}
+                   u'handler': basestring}
+REQUIRED_UPLOADER_PARAMS = {u'memory': int, u'timeout': int,
+                            u'handler': basestring}
 REQUIRED_VPC_PARAMS = {u'subnets': list, u'security_groups': list}
 
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
                   u'ignore': [], u'extra_files': [], u'vpc': None,
-                  u's3_bucket': None, u's3_key': None}
+                  u's3_bucket': None, u's3_key': None, u'role': None,
+                  u'timeout': 3, u'memory': 128, u'region': None}
 
 
 class Config(object):
-    def __init__(self, pth, config_file=None, role=None):
+    def __init__(self, pth, config_file=None, role=None, region=None):
         self._path = pth
         self._config = None
         self._load_config(config_file)
-        if role is not None:
-            self._config['role'] = role
+        self._config['role'] = role
+        self._config['region'] = region
         self._set_defaults()
         if self._config['vpc']:
             self._validate_vpc()
