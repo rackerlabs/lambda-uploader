@@ -29,7 +29,7 @@ REQUIRED_VPC_PARAMS = {u'subnets': list, u'security_groups': list}
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
                   u'ignore': [], u'extra_files': [], u'vpc': None,
-                  u's3_bucket': None, u's3_key': None}
+                  u's3_bucket': None, u's3_key': None, u'runtime': 'python2.7'}
 
 
 class Config(object):
@@ -84,6 +84,10 @@ class Config(object):
         self._config['alias'] = alias
         self._config['alias_description'] = description
         self._config['publish'] = True
+
+    '''Set the runtime '''
+    def set_runtime(self, runtime):
+        self._config['runtime'] = runtime
 
     '''Set all defaults after loading the config'''
     def _set_defaults(self):

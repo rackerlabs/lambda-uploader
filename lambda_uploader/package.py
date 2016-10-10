@@ -36,6 +36,7 @@ ZIPFILE_NAME = 'lambda_function.zip'
 
 def build_package(path, requires, virtualenv=None, ignore=[],
                   extra_files=[], zipfile_name=ZIPFILE_NAME):
+    '''Builds the zip file and creates the package with it'''
     pkg = Package(path, zipfile_name)
 
     if extra_files:
@@ -46,6 +47,12 @@ def build_package(path, requires, virtualenv=None, ignore=[],
     pkg.requirements(requires)
     pkg.build(ignore)
 
+    return pkg
+
+
+def create_package(path, zipfile_name=ZIPFILE_NAME):
+    '''Creates the package with already existing zip file'''
+    pkg = Package(path, zipfile_name)
     return pkg
 
 
