@@ -17,14 +17,19 @@ python setup.py install
 
 ### Configuration File
 The lambda uploader expects a directory with, at a minimum, your lambda function
-and a lambda.json file.  It is not necessary to set requirements in your config
+and a `lambda.json` file.  It is not necessary to set requirements in your config
 file since the lambda uploader will also check for and use a requirements.txt file.
 
-Please note that you can leave the "vpc" object out of your config if you want your
+Please note that you can leave the `vpc` object out of your config if you want your
 lambda function to use your default VPC and subnets. If you wish to use your lambda
 function inside a specific VPC, make sure you set up the role correctly to allow this.
 
-Example lambda.json file:
+Note also the `ignore` entry is an array of regular expression strings
+used to match against the relative paths - be careful to quote accordingly.
+For example, a traditional `*.txt` "glob" is matched by the JSON string: 
+`".*\\.txt$"` (or just `"\\.txt$"`).
+
+Example `lambda.json` file:
 ```json
 {
   "name": "myFunction",
@@ -35,9 +40,9 @@ Example lambda.json file:
   "role": "arn:aws:iam::00000000000:role/lambda_basic_execution",
   "requirements": ["pygithub"],
   "ignore": [
-    "circle.yml",
-    ".git",
-    "/*.pyc"
+    "circle\\.yml$",
+    "\\.git$",
+    "/.*\\.pyc$"
   ],
   "timeout": 30,
   "memory": 512,

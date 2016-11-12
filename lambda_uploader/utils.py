@@ -21,7 +21,8 @@ import re
 LOG = logging.getLogger(__name__)
 
 
-def copy_tree(src, dest, ignore=[], include_parent=False):
+def copy_tree(src, dest, ignore=None, include_parent=False):
+    ignore = ignore or []
     if os.path.isfile(src):
         raise Exception('Cannot use copy_tree with a file as the src')
 
@@ -55,7 +56,8 @@ def copy_tree(src, dest, ignore=[], include_parent=False):
 
 # Iterate through every item in ignore
 # and check for matches in the path
-def _ignore_file(path, ignore=[]):
+def _ignore_file(path, ignore=None):
+    ignore = ignore or []
     if not ignore:
         return False
     for ign in ignore:

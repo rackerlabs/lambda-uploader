@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import pytest
 
@@ -9,6 +10,7 @@ from lambda_uploader import package
 TESTING_TEMP_DIR = '.testing_temp'
 WORKING_TEMP_DIR = path.join(TESTING_TEMP_DIR, '.lambda_uploader_temp')
 PACKAGE_TEMP_DIR = path.join(WORKING_TEMP_DIR, 'lambda_package')
+DOTFILE_REGEX = r'^\.[^.].*'
 
 
 def setup_module(module):
@@ -19,6 +21,10 @@ def setup_module(module):
 def teardown_module(module):
     print('calling teardown')
     rmtree(TESTING_TEMP_DIR)
+
+
+def setup():
+    shutil.rmtree(PACKAGE_TEMP_DIR, True)
 
 
 def test_package_zip_location():
@@ -138,6 +144,40 @@ def test_package_with_extras():
     # test a recursive directory
     expected_extra_file2 = path.join(PACKAGE_TEMP_DIR, 'extra/foo/__init__.py')
     assert path.isfile(expected_extra_file2)
+
+    # test a hidden file
+    expected_dotfile = path.join(PACKAGE_TEMP_DIR, 'extra', '.dotfile')
+    assert path.isfile(expected_dotfile)
+
+
+def test_package_with_ignores():
+    pkg = package.Package(TESTING_TEMP_DIR)
+    pkg.extra_file(path.join('tests', 'extra'))
+    pkg.package(ignore=[DOTFILE_REGEX])
+
+    # test ignored file is *not* there
+    dotfile = path.join(PACKAGE_TEMP_DIR, 'extra', '.dotfile')
+    assert not path.exists(dotfile)
+
+
+def test_ignores_using_all_items_and_regex():
+    pkg = package.Package(TESTING_TEMP_DIR)
+    pyc_path = path.join(TESTING_TEMP_DIR, 'fake.pyc')
+    py_path = path.join(TESTING_TEMP_DIR, 'real.py')
+    open(py_path, 'w').close()
+    open(pyc_path, 'w').close()
+
+    pkg.package([r"dummy.*", r'[a-z]+\.pyc'])
+
+    os.remove(py_path)
+    os.remove(pyc_path)
+
+    # test the ignores has excluded the .pyc
+    expected_extra_file = path.join(PACKAGE_TEMP_DIR, 'fake.pyc')
+    assert not path.exists(expected_extra_file)
+
+    # ...but the path not affected by either ignore entry remains
+    assert path.exists(path.join(PACKAGE_TEMP_DIR, 'real.py'))
 
 
 def test_package_name():

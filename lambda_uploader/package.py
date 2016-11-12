@@ -17,12 +17,13 @@ import shutil
 import zipfile
 import logging
 import sys
+import re
 
 from subprocess import Popen, PIPE
 from lambda_uploader import utils
 from distutils.spawn import find_executable
 
-# Python 2/3 compatability
+# Python 2/3 compatibility
 try:
     basestring
 except NameError:
@@ -34,8 +35,8 @@ TEMP_WORKSPACE_NAME = ".lambda_uploader_temp"
 ZIPFILE_NAME = 'lambda_function.zip'
 
 
-def build_package(path, requires, virtualenv=None, ignore=[],
-                  extra_files=[], zipfile_name=ZIPFILE_NAME):
+def build_package(path, requires, virtualenv=None, ignore=None,
+                  extra_files=None, zipfile_name=ZIPFILE_NAME):
     '''Builds the zip file and creates the package with it'''
     pkg = Package(path, zipfile_name)
 
@@ -69,7 +70,7 @@ class Package(object):
         self._requirements_file = os.path.join(self._path, "requirements.txt")
         self._extra_files = []
 
-    def build(self, ignore=[]):
+    def build(self, ignore=None):
         '''Calls all necessary methods to build the Lambda Package'''
         self._prepare_workspace()
         self.install_dependencies()
@@ -214,7 +215,7 @@ class Package(object):
             if prc.returncode is not 0:
                 raise Exception('pip returned unsuccessfully')
 
-    def package(self, ignore=[]):
+    def package(self, ignore=None):
         """
         Create a zip file of the lambda script and its dependencies.
 
@@ -223,6 +224,7 @@ class Package(object):
             those files when creating the zip file. The paths to be matched are
             local to the source root.
         """
+        ignore = ignore or []
         package = os.path.join(self._temp_workspace, 'lambda_package')
 
         # Copy site packages into package base
@@ -243,13 +245,13 @@ class Package(object):
                 utils.copy_tree(lib64_path, package)
 
         # Append the temp workspace to the ignore list:
-        ignore += ["^%s/*" % TEMP_WORKSPACE_NAME]
+        ignore.append(r"^%s/.*" % re.escape(TEMP_WORKSPACE_NAME))
         utils.copy_tree(self._path, package, ignore)
 
         # Add extra files
         for p in self._extra_files:
             LOG.info('Copying extra %s into package' % p)
-            ignore += ["%s" % p]
+            ignore.append(re.escape(p))
             if os.path.isdir(p):
                 utils.copy_tree(p, package, ignore=ignore, include_parent=True)
             else:

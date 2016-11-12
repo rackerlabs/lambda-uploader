@@ -19,12 +19,17 @@ PATHS_TO_BE_IGNORED = [
 ]
 
 TEST_IGNORE = [
-    'ignore/*',
+    'ignore/.*',
     'ignore-me.py',
     # The one below would exclude all the files if files to be ignored were
     # matched based on the full path, rather than the path relative to the
     # source directory, since the source directory contains 'test' in its path.
     'tests',
+]
+
+IGNORE_TEMP = [
+    r'^\.[^.].*',
+    r'.*\.pyc$'
 ]
 
 
@@ -49,8 +54,25 @@ def test_copy_tree():
 
 
 def test_ignore_file():
-    result = utils._ignore_file('ignore/foo.py', TEST_IGNORE)
-    assert result
+    ignored = utils._ignore_file('ignore/foo.py', TEST_IGNORE)
+    assert ignored
 
-    res = utils._ignore_file('bar/foo.py', TEST_IGNORE)
-    assert res is False
+    ignored = utils._ignore_file('ignore', TEST_IGNORE)
+    assert not ignored
+
+    ignored = utils._ignore_file('bar/foo.py', TEST_IGNORE)
+    assert not ignored
+
+
+def test_ignore_file_dotfile():
+    ignored = utils._ignore_file('.mydotfile', IGNORE_TEMP)
+    assert ignored
+
+
+def test_ignore_pyc():
+    ignored = utils._ignore_file('pycharm', IGNORE_TEMP)
+    assert not ignored
+
+    ignored = utils._ignore_file('bar/foo.pyc', IGNORE_TEMP)
+    assert ignored
+
