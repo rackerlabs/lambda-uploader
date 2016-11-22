@@ -6,9 +6,9 @@
   "role": "arn:aws:iam::00000000000:role/lambda_basic_execution",
   "requirements": ["Jinja2==2.8"],
   "ignore": [
-    "circle.yml",
-    ".git",
-    "/*.pyc"
+    "circle\\.yml$",
+    "\\.git$",
+    "/.*\\.pyc$"
   ],
   "timeout": 30,
   "memory": 512
