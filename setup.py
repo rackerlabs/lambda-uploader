@@ -53,6 +53,7 @@ def package_meta():
         'url': url,
     }
 
+
 _lu_meta = package_meta()
 
 setup(
