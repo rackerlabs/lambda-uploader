@@ -91,6 +91,7 @@ def test_invalid_config_missing_function_dir2():
             path.join(EX_CONFIG, 'lambda.json')
         )
 
+
 def test_default_runtime():
     cfg = config.Config(EX_CONFIG)
     assert cfg.runtime == 'python2.7'
