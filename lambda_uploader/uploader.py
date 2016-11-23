@@ -38,7 +38,6 @@ class PackageUploader(object):
     returns the package version
     '''
     def upload_existing(self, pkg):
-        environment = {'Variables': self._config.variables}
         self._validate_package_size(pkg.zip_file)
         with open(pkg.zip_file, "rb") as fil:
             zip_file = fil.read()
@@ -70,7 +69,6 @@ class PackageUploader(object):
             Timeout=self._config.timeout,
             MemorySize=self._config.memory,
             VpcConfig=self._vpc_config,
-            Environment=environment,
         )
         LOG.debug("AWS update_function_configuration response: %s"
                   % response)
@@ -92,7 +90,6 @@ class PackageUploader(object):
     returns the package version
     '''
     def upload_new(self, pkg):
-        environment = {'Variables': self._config.variables}
         code = {}
         if self._config.s3_bucket:
             code = {'S3Bucket': self._config.s3_bucket,
@@ -116,7 +113,6 @@ class PackageUploader(object):
             MemorySize=self._config.memory,
             Publish=self._config.publish,
             VpcConfig=self._vpc_config,
-            Environment=environment,
         )
         LOG.debug("AWS create_function response: %s" % response)
 
