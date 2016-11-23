@@ -29,7 +29,8 @@ REQUIRED_VPC_PARAMS = {u'subnets': list, u'security_groups': list}
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
                   u'ignore': [], u'extra_files': [], u'vpc': None,
-                  u's3_bucket': None, u's3_key': None, u'runtime': 'python2.7'}
+                  u's3_bucket': None, u's3_key': None, u'runtime': 'python2.7',
+                  u'variables': {}}
 
 
 class Config(object):
