@@ -47,7 +47,8 @@ def _print(txt):
 def _execute(args):
     pth = path.abspath(args.function_dir)
 
-    cfg = config.Config(pth, args.config, role=args.role)
+    cfg = config.Config(pth, args.config, role=args.role,
+                        variables=args.variables)
 
     if args.s3_bucket:
         cfg.set_s3(args.s3_bucket, args.s3_key)
@@ -140,6 +141,8 @@ def main(arv=None):
                         default=getenv('LAMBDA_UPLOADER_ROLE'),
                         help=('IAM role to assign the lambda function, '
                               'can be set with $LAMBDA_UPLOADER_ROLE'))
+    parser.add_argument('--variables', dest='variables',
+                        help='add environment variables')
     parser.add_argument('--profile', dest='profile',
                         help='specify AWS cli profile')
     parser.add_argument('--requirements', '-r', dest='requirements',

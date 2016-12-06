@@ -34,12 +34,14 @@ DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
 
 
 class Config(object):
-    def __init__(self, pth, config_file=None, role=None):
+    def __init__(self, pth, config_file=None, role=None, variables=None):
         self._path = pth
         self._config = None
         self._load_config(config_file)
         if role is not None:
             self._config['role'] = role
+        if variables is not None:
+            self._config['variables'] = json.loads(variables)
         self._set_defaults()
         if self._config['vpc']:
             self._validate_vpc()
