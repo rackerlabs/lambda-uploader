@@ -1,6 +1,13 @@
 lambda-uploader CHANGELOG
 =========================
 
+1.1.0
+-----
+- Runtime is now a configurable option
+- Exclusion regexes now quoted properly
+- Added support for Lambda environment variables
+- Boto3 version dependency updated to support Step functions
+
 1.0.3
 -----
 - Fixed issue in copy trees attempting to make a parent directory even
