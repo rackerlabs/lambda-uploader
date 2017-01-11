@@ -24,6 +24,8 @@ import lambda_uploader
 
 from os import getcwd, path, getenv
 from lambda_uploader import package, config, uploader
+from boto3 import __version__ as boto3_version
+from botocore import __version__ as botocore_version
 
 LOG = logging.getLogger(__name__)
 
@@ -32,6 +34,11 @@ CHECK = '\xe2\x9c\x85'
 INTERROBANG = '\xe2\x81\x89\xef\xb8\x8f'
 RED_X = '\xe2\x9d\x8c'
 LAMBDA = '\xce\xbb'
+TRACEBACK_MESSAGE = """%s Unexpected error. Please report this traceback.
+Uploader: %s
+Botocore: %s
+Boto3: %s
+"""
 
 
 # Used for stdout for shell
@@ -181,8 +188,10 @@ def main(arv=None):
     try:
         _execute(args)
     except Exception:
-        print('%s Unexpected error. Please report this traceback.'
-              % INTERROBANG, file=sys.stderr)
+        print(TRACEBACK_MESSAGE
+              % (INTERROBANG, lambda_uploader.__version__,
+                 boto3_version, botocore_version),
+              file=sys.stderr)
 
         traceback.print_exc()
         sys.stderr.flush()
