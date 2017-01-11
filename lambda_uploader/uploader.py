@@ -208,7 +208,10 @@ class PackageUploader(object):
                 'SecurityGroupIds': self._config.raw['vpc']['security_groups']
             }
         else:
-            return {}
+            return {
+                'SubnetIds': [],
+                'SecurityGroupIds': [],
+            }
 
     def _upload_s3(self, zip_file):
         '''
