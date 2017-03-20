@@ -52,6 +52,25 @@ def test_copy_tree():
     rmtree(TESTING_TEMP_DIR)
     rmtree(copy_dir)
 
+def test_copy_tree_with_symlink():
+    os.mkdir(TESTING_TEMP_DIR)
+    filename = 'foo.py'
+    symlink_filename = "sym-{}".format(filename)
+    with open(path.join(TESTING_TEMP_DIR, filename), 'w') as tfile:
+        tfile.write(filename)
+    os.symlink(path.join(TESTING_TEMP_DIR,filename), path.join(TESTING_TEMP_DIR,symlink_filename))
+    copy_dir = '.copy_of_test'
+
+    utils.copy_tree(TESTING_TEMP_DIR, copy_dir)
+
+    assert os.path.islink(path.join(copy_dir,symlink_filename))
+    linkto = os.readlink(path.join(copy_dir,symlink_filename))
+    assert linkto == path.join(copy_dir, filename)
+
+    rmtree(TESTING_TEMP_DIR)
+    rmtree(copy_dir)
+
+
 
 def test_ignore_file():
     ignored = utils._ignore_file('ignore/foo.py', TEST_IGNORE)
