@@ -53,7 +53,8 @@ def copy_tree(src, dest, ignore=None, include_parent=False):
             LOG.debug("Copying %s to %s" % (path, pkg_path))
             if os.path.islink(path):
                 linkto = os.readlink(path)
-                os.symlink(linkto.replace(src, dest, 1), os.path.join(pkg_path, filename))
+                os.symlink(linkto.replace(src, dest, 1),
+                           os.path.join(pkg_path, filename))
             else:
                 shutil.copy(path, pkg_path)
 
