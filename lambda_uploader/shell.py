@@ -23,7 +23,7 @@ import traceback
 import lambda_uploader
 
 from os import getcwd, path, getenv
-from lambda_uploader import package, config, uploader
+from lambda_uploader import package, config, uploader, subscribers
 from boto3 import __version__ as boto3_version
 from botocore import __version__ as botocore_version
 
@@ -103,6 +103,10 @@ def _execute(args):
         # If the alias was set create it
         if create_alias:
             upldr.alias()
+
+        if cfg.subscription:
+            _print('Creating subscription')
+            subscribers.create_subscriptions(cfg, args.profile)
 
         pkg.clean_zipfile()
 
