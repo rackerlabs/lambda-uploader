@@ -24,13 +24,23 @@ except NameError:
 REQUIRED_PARAMS = {u'name': basestring, u'description': basestring,
                    u'region': basestring, u'handler': basestring,
                    u'role': basestring, u'timeout': int, u'memory': int}
+REQUIRED_PARAMSaws = {u'FunctionName': basestring, u'Description': basestring,
+                   u'FunctionArn': basestring, u'Handler': basestring,
+                   u'Role': basestring, u'Timeout': int, u'MemorySize': int}
+
 REQUIRED_VPC_PARAMS = {u'subnets': list, u'security_groups': list}
+REQUIRED_VPC_PARAMSaws = {u'SubnetIds': list, u'SecurityGroupIds': list}
 
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
                   u'ignore': [], u'extra_files': [], u'vpc': None,
                   u's3_bucket': None, u's3_key': None, u'runtime': 'python2.7',
                   u'variables': {}}
+
+DEFAULT_PARAMSaws = {u'requirements': [], u'publish': False,
+                  u'alias': None, u'alias_description': None,
+                  u'ignore': [], u'extra_files': [], u'vpc': None,
+                  u's3_bucket': None, u's3_key': None}
 
 
 class Config(object):
@@ -43,11 +53,19 @@ class Config(object):
         if variables is not None:
             self._config['variables'] = json.loads(variables)
         self._set_defaults()
-        if self._config['vpc']:
-            self._validate_vpc()
-
-        for param, clss in REQUIRED_PARAMS.items():
-            self._validate(param, cls=clss)
+        if self._config['FunctionArn']:
+            REQUIRED_PARAMS=REQUIRED_PARAMSaws
+            REQUIRED_VPC_PARAMS=REQUIRED_VPC_PARAMSaws
+            DEFAULT_PARAMS=DEFAULT_PARAMSaws
+            if self._config['VpcConfig']:
+                self._validate_vpc(1)
+            for param, clss in REQUIRED_PARAMSaws.items():
+                self._validate(param, cls=clss)
+        else:
+            if self._config['vpc']:
+                self._validate_vpc()
+            for param, clss in REQUIRED_PARAMS.items():
+                self._validate(param, cls=clss)
 
     '''
     Return raw config
@@ -68,7 +86,10 @@ class Config(object):
         if self._config['alias_description'] is None:
             return self._config['description']
         else:
-            return self._config['alias_description']
+            if self._config['Description'] != None:
+                return self._config['Description']
+            else:
+                return self._config['alias_description']
 
     '''
     Public method to set the S3 bucket and keyname
@@ -100,6 +121,10 @@ class Config(object):
 
     '''Validate the configuration file'''
     def _validate(self, key, cls=None):
+        if self._config['FunctionArn']:
+            REQUIRED_PARAMS=REQUIRED_PARAMSaws
+            REQUIRED_VPC_PARAMS=REQUIRED_VPC_PARAMSaws
+            DEFAULT_PARAMS=DEFAULT_PARAMSaws
         if key not in self._config:
             raise ValueError("Config %s must have %s set"
                              % (self._path, key))
@@ -107,18 +132,31 @@ class Config(object):
         return self._compare(key, cls, self._config[key])
 
     '''Validate the VPC configuration'''
-    def _validate_vpc(self):
-        for param, clss in REQUIRED_VPC_PARAMS.items():
-            self._compare(param, clss, self._config['vpc'].get(param))
+    def _validate_vpc(self,awsversion=None):
+        if awsversion:
+            for param, clss in REQUIRED_VPC_PARAMSaws.items():
+                self._compare(param, clss, self._config['VpcConfig'].get(param))
+
+            if len(self._config['VpcConfig'].get(param)) == 0:
+                    raise TypeError("VPC Config '%s' should have at least"
+                                 " one item in its array!" % param)
+            for value in self._config['VpcConfig'].get(param):
+                 if not isinstance(value, basestring):
+                     raise TypeError("VPC Config arrays can only contain"
+                                     " strings. '%s' contains something else"
+                                     % param)
+        else:
+            for param, clss in REQUIRED_VPC_PARAMS.items():
+             self._compare(param, clss, self._config['vpc'].get(param))
 
             if len(self._config['vpc'].get(param)) == 0:
-                raise TypeError("VPC Config '%s' should have at least"
-                                " one item in its array!" % param)
+                 raise TypeError("VPC Config '%s' should have at least"
+                                 " one item in its array!" % param)
             for value in self._config['vpc'].get(param):
-                if not isinstance(value, basestring):
-                    raise TypeError("VPC Config arrays can only contain"
-                                    " strings. '%s' contains something else"
-                                    % param)
+                 if not isinstance(value, basestring):
+                     raise TypeError("VPC Config arrays can only contain"
+                                     " strings. '%s' contains something else"
+                                     % param)
 
     '''Compare if a string is a certain type'''
     def _compare(self, key, cls, value):
