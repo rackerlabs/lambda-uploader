@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import time
 import boto3
 import botocore
 import logging
@@ -43,10 +42,7 @@ class KinesisSubscriber(object):
             LOG.debug('Subscription created')
         except botocore.exceptions.ClientError as ex:
             response_code = ex.response['Error']['Code']
-            if response_code == 'InvalidParameterValueException':
-                LOG.debug('Retrying subscription')
-                time.sleep(3)
-            elif response_code == 'ResourceConflictException':
+            if response_code == 'ResourceConflictException':
                 LOG.debug('Subscription exists')
             else:
                 LOG.error('Subscription failed, error=%s' % str(ex))
