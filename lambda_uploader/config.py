@@ -25,12 +25,14 @@ REQUIRED_PARAMS = {u'name': basestring, u'description': basestring,
                    u'region': basestring, u'handler': basestring,
                    u'role': basestring, u'timeout': int, u'memory': int}
 REQUIRED_VPC_PARAMS = {u'subnets': list, u'security_groups': list}
+REQUIRED_KINESIS_SUBSCRIPTION_PARAMS = {u'stream': basestring,
+                                        u'batch_size': int}
 
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
                   u'ignore': [], u'extra_files': [], u'vpc': None,
                   u's3_bucket': None, u's3_key': None, u'runtime': 'python2.7',
-                  u'variables': {}}
+                  u'variables': {}, u'subscription': {}}
 
 
 class Config(object):
@@ -45,6 +47,8 @@ class Config(object):
         self._set_defaults()
         if self._config['vpc']:
             self._validate_vpc()
+        if self._config['subscription']:
+            self._validate_subscription()
 
         for param, clss in REQUIRED_PARAMS.items():
             self._validate(param, cls=clss)
@@ -119,6 +123,21 @@ class Config(object):
                     raise TypeError("VPC Config arrays can only contain"
                                     " strings. '%s' contains something else"
                                     % param)
+
+    '''Validate the subscription configuration.
+    All kinds of subscription will be validated here'''
+    def _validate_subscription(self):
+        def validate_kinesis():
+            ksub = self._config['subscription']['kinesis']
+            for param, clss in REQUIRED_KINESIS_SUBSCRIPTION_PARAMS.items():
+                self._compare(param, clss, ksub.get(param))
+
+                if ksub['batch_size'] <= 0:
+                    raise TypeError("Batch size in Kinesis subscription must"
+                                    " be greater than 0")
+
+        if 'kinesis' in self._config['subscription']:
+            validate_kinesis()
 
     '''Compare if a string is a certain type'''
     def _compare(self, key, cls, value):

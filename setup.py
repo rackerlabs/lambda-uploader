@@ -20,6 +20,8 @@ TEST_REQUIRES = [
     'coverage>=4.0.3',
     'pytest>=2.9.1',
     'moto>=0.4.23',
+    'mock',
+    'nose',
 ]
 
 

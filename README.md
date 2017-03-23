@@ -26,7 +26,7 @@ function inside a specific VPC, make sure you set up the role correctly to allow
 
 Note also the `ignore` entry is an array of regular expression strings
 used to match against the relative paths - be careful to quote accordingly.
-For example, a traditional `*.txt` "glob" is matched by the JSON string: 
+For example, a traditional `*.txt` "glob" is matched by the JSON string:
 `".*\\.txt$"` (or just `"\\.txt$"`).
 
 Example `lambda.json` file:
@@ -56,6 +56,30 @@ Example `lambda.json` file:
   }
 }
 ```
+
+You can also optionally setup a subscription to a Kinesis stream for your
+lambda using the `subscription` field as in the following sample configuration.
+
+```json
+{
+  "name": "myFunction",
+  "description": "It does things",
+  "region": "us-east-1",
+  "runtime": "python2.7",
+  "handler": "function.lambda_handler",
+  "role": "arn:aws:iam::00000000000:role/lambda_basic_execution",
+  "requirements": ["pygithub"],
+  "timeout": 30,
+  "memory": 512,
+  "subscription": {
+    "kinesis": {
+      "stream": "arn:aws:kinesis:eu-west-1:000000000000:stream/services",
+      "batch_size": 10
+    }
+  }
+}
+```
+
 
 ### Command Line Usage
 To package and upload simply run the command from within your lambda directory or

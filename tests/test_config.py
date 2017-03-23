@@ -48,6 +48,16 @@ def test_no_vpc():
     assert cfg.raw['vpc'] is None
 
 
+def test_kinesis_subscription():
+    ksub = {
+        'stream': 'arn:aws:kinesis:eu-west-1:000000000000:stream/services',
+        'batch_size': 10
+    }
+    cfg = config.Config(EX_CONFIG, EX_CONFIG + '/lambda-with-subscription.json')
+    assert cfg.raw['subscription']['kinesis']['stream'] == ksub['stream']
+    assert cfg.raw['subscription']['kinesis']['batch_size'] == ksub['batch_size']
+
+
 def test_set_publish():
     cfg = config.Config(EX_CONFIG)
     # Check that we default to false
