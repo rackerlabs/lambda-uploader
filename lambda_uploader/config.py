@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import json
+from datetime import datetime
 from os import path
 
 # Python 2/3 compatability
@@ -26,7 +27,8 @@ REQUIRED_PARAMS = {u'name': basestring, u'description': basestring,
                    u'role': basestring, u'timeout': int, u'memory': int}
 REQUIRED_VPC_PARAMS = {u'subnets': list, u'security_groups': list}
 REQUIRED_KINESIS_SUBSCRIPTION_PARAMS = {u'stream': basestring,
-                                        u'batch_size': int}
+                                        u'batch_size': int,
+                                        u'starting_position': basestring}
 
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
@@ -135,6 +137,20 @@ class Config(object):
                 if ksub['batch_size'] <= 0:
                     raise TypeError("Batch size in Kinesis subscription must"
                                     " be greater than 0")
+
+                valid_starting_pos = ['TRIM_HORIZON', 'LATEST', 'AT_TIMESTAMP']
+                if ksub['starting_position'] not in valid_starting_pos:
+                    raise TypeError("Starting position in Kinesis"
+                                    " must be one of %s" % valid_starting_pos)
+
+                if ksub['starting_position'] == 'AT_TIMESTAMP':
+                    ts = ksub.get('starting_position_timestamp')
+                    try:
+                        datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
+                    except:
+                        raise TypeError("Starting position timestamp"
+                                        " must have format "
+                                        " YYYY-mm-ddTHH:MM:SSZ")
 
         if 'kinesis' in self._config['subscription']:
             validate_kinesis()
