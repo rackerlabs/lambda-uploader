@@ -58,6 +58,28 @@ def test_kinesis_subscription():
     assert cfg.raw['subscription']['kinesis']['batch_size'] == ksub['batch_size']
 
 
+def test_kinesis_subscription_with_starting_position_at_timestamp():
+    ksub = {
+        'stream': 'arn:aws:kinesis:eu-west-1:000000000000:stream/services',
+        'batch_size': 10,
+        'starting_position_timestamp': '2017-11-01T11:00:00Z'
+    }
+    cfg = config.Config(EX_CONFIG, EX_CONFIG + '/lambda-with-subscription_at_ts.json')
+    assert cfg.raw['subscription']['kinesis']['stream'] == ksub['stream']
+    assert cfg.raw['subscription']['kinesis']['batch_size'] == ksub['batch_size']
+    assert cfg.raw['subscription']['kinesis']['starting_position_timestamp'] == ksub['starting_position_timestamp']
+
+
+def test_kinesis_subscription_with_starting_position_at_timestamp_fails_when_timestamp_is_invalid():
+    with pytest.raises(Exception):
+        cfg = config.Config(EX_CONFIG, EX_CONFIG + '/lambda-with-subscription_at_ts_invalid_ts.json')
+
+
+def test_kinesis_subscription_with_starting_position_at_timestamp_fails_when_timestamp_not_provided():
+    with pytest.raises(Exception):
+        cfg = config.Config(EX_CONFIG, EX_CONFIG + '/lambda-with-subscription_at_ts_not_provided.json')
+
+
 def test_set_publish():
     cfg = config.Config(EX_CONFIG)
     # Check that we default to false

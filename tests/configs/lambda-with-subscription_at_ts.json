@@ -16,7 +16,8 @@
     "kinesis": {
       "stream": "arn:aws:kinesis:eu-west-1:000000000000:stream/services",
       "batch_size": 10,
-      "starting_position": "TRIM_HORIZON"
+      "starting_position": "TRIM_HORIZON",
+      "starting_position_timestamp": "2017-11-01T11:00:00Z"
     }
   },
   "vpc": {
