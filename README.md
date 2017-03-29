@@ -17,8 +17,9 @@ python setup.py install
 
 ### Configuration File
 The lambda uploader expects a directory with, at a minimum, your lambda function
-and a `lambda.json` file.  It is not necessary to set requirements in your config
-file since the lambda uploader will also check for and use a requirements.txt file.
+and a `lambda.json` configuration file in the same directory.  It is not necessary to set
+requirements in your config file since the lambda uploader will also check for and use a
+requirements.txt file.
 
 Please note that you can leave the `vpc` object out of your config if you want your
 lambda function to use your default VPC and subnets. If you wish to use your lambda

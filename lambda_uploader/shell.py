@@ -170,7 +170,7 @@ def main(arv=None):
                         help='Key name of the lambda function s3 object',
                         default=None)
     parser.add_argument('--config', '-c', help='Overrides lambda.json',
-                        default='lambda.json')
+                        default=None)
     parser.add_argument('function_dir', default=getcwd(), nargs='?',
                         help='lambda function directory')
     parser.add_argument('--no-build', dest='no_build',

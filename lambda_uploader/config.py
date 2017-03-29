@@ -156,7 +156,7 @@ class Config(object):
         if not path.isdir(self._path):
             raise Exception("%s not a valid function directory" % self._path)
 
-        if not lambda_file:
+        if lambda_file:
             lambda_file = path.join(self._path, 'lambda.json')
 
         if not path.isfile(lambda_file):
