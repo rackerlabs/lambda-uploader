@@ -67,6 +67,9 @@ Example ``lambda.json`` file:
         "security_groups": [
           "sg-00000000"
         ]
+      },
+      "tracing": {
+        "Mode": "Active"
       }
     }
 

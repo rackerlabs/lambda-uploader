@@ -29,12 +29,13 @@ REQUIRED_VPC_PARAMS = {u'subnets': list, u'security_groups': list}
 REQUIRED_KINESIS_SUBSCRIPTION_PARAMS = {u'stream': basestring,
                                         u'batch_size': int,
                                         u'starting_position': basestring}
+REQUIRED_TRACING_MODES = ['Active', 'PassThrough']
 
 DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
                   u'ignore': [], u'extra_files': [], u'vpc': None,
                   u's3_bucket': None, u's3_key': None, u'runtime': 'python2.7',
-                  u'variables': {}, u'subscription': {}}
+                  u'variables': {}, u'subscription': {}, u'tracing': {}}
 
 
 class Config(object):
@@ -51,6 +52,8 @@ class Config(object):
             self._validate_vpc()
         if self._config['subscription']:
             self._validate_subscription()
+        if self._config['tracing']:
+            self._validate_tracing()
 
         for param, clss in REQUIRED_PARAMS.items():
             self._validate(param, cls=clss)
@@ -125,6 +128,16 @@ class Config(object):
                     raise TypeError("VPC Config arrays can only contain"
                                     " strings. '%s' contains something else"
                                     % param)
+
+    '''Validate the tracing configuration'''
+    def _validate_tracing(self):
+        if len(self._config['tracing']) > 1:
+            raise TypeError("Tracing Config can only contain one item")
+        if not self._config['tracing'].get('Mode'):
+            raise TypeError("Tracing Config must contain the `Mode` key")
+        if self._config['tracing']['Mode'] not in REQUIRED_TRACING_MODES:
+            raise TypeError("Tracing Config Mode must be one of {}".format(
+                ', '.join(REQUIRED_TRACING_MODES)))
 
     '''Validate the subscription configuration.
     All kinds of subscription will be validated here'''
