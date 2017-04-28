@@ -71,6 +71,7 @@ class PackageUploader(object):
             MemorySize=self._config.memory,
             VpcConfig=self._vpc_config,
             Environment=environment,
+            TracingConfig=self._config.tracing,
         )
         LOG.debug("AWS update_function_configuration response: %s"
                   % response)
@@ -117,6 +118,7 @@ class PackageUploader(object):
             Publish=self._config.publish,
             VpcConfig=self._vpc_config,
             Environment=environment,
+            TracingConfig=self._config.tracing,
         )
         LOG.debug("AWS create_function response: %s" % response)
 
