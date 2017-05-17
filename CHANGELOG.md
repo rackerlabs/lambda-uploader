@@ -1,6 +1,15 @@
 lambda-uploader CHANGELOG
 =========================
 
+1.2.0
+-----
+- Added support for X-Ray tracing
+- Added support for configuring a Kinesis subscription
+- Symlinks can now be copied when creating the Lambda Package
+- VPC Configuration is fixed
+- Boto3, Botocore and Lambda Uploader Versions are now reported as part
+  of traceback.
+
 1.1.0
 -----
 - Runtime is now a configurable option
