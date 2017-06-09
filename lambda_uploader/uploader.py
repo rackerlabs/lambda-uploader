@@ -72,6 +72,7 @@ class PackageUploader(object):
             VpcConfig=self._vpc_config,
             Environment=environment,
             TracingConfig=self._config.tracing,
+            Runtime=self._config.runtime,
         )
         LOG.debug("AWS update_function_configuration response: %s"
                   % response)
