@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
 import os
 import shutil
 import zipfile
@@ -231,18 +232,35 @@ class Package(object):
         LOG.info('Copying site packages')
 
         if hasattr(self, '_pkg_venv') and self._pkg_venv:
-            site_packages = 'lib/python2.7/site-packages'
-            lib64_site_packages = 'lib64/python2.7/site-packages'
+            site_packages = None
+            lib64_site_packages = None
             if sys.platform == 'win32' or sys.platform == 'cygwin':
                 lib64_site_packages = 'lib64\\site-packages'
                 site_packages = 'lib\\site-packages'
+            else:
+                # Look for the site packages
+                lib_site_list = glob.glob(os.path.join(
+                    self._pkg_venv, 'lib/python*/site-packages'))
+                if lib_site_list:
+                    site_packages = lib_site_list[0]
+                else:
+                    LOG.debug("no lib site packages found")
 
-            utils.copy_tree(os.path.join(self._pkg_venv, site_packages),
-                            package)
-            lib64_path = os.path.join(self._pkg_venv, lib64_site_packages)
-            if not os.path.islink(lib64_path):
-                LOG.info('Copying lib64 site packages')
-                utils.copy_tree(lib64_path, package)
+                lib64_site_list = glob.glob(os.path.join(
+                    self._pkg_venv, 'lib64/python*/site-packages'))
+                if lib64_site_list:
+                    lib64_site_packages = lib64_site_list[0]
+                else:
+                    LOG.debug("no lib64 site packages found")
+
+            if site_packages:
+                utils.copy_tree(os.path.join(self._pkg_venv, site_packages),
+                                package)
+            if lib64_site_packages:
+                lib64_path = os.path.join(self._pkg_venv, lib64_site_packages)
+                if not os.path.islink(lib64_path):
+                    LOG.info('Copying lib64 site packages')
+                    utils.copy_tree(lib64_path, package)
 
         # Append the temp workspace to the ignore list:
         ignore.append(r"^%s/.*" % re.escape(TEMP_WORKSPACE_NAME))
