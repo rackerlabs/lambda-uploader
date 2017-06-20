@@ -233,6 +233,11 @@ class Package(object):
         if hasattr(self, '_pkg_venv') and self._pkg_venv:
             site_packages = 'lib/python2.7/site-packages'
             lib64_site_packages = 'lib64/python2.7/site-packages'
+            if not os.path.exists('lib/python2.7'):
+                # http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html
+                # Since Lambda supports python 3.6 it is fixed at 3.6
+                site_packages = 'lib/python3.6/site-packages'
+                lib64_site_packages = 'lib64/python3.6/site-packages'
             if sys.platform == 'win32' or sys.platform == 'cygwin':
                 lib64_site_packages = 'lib64\\site-packages'
                 site_packages = 'lib\\site-packages'
