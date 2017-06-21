@@ -232,35 +232,31 @@ class Package(object):
         LOG.info('Copying site packages')
 
         if hasattr(self, '_pkg_venv') and self._pkg_venv:
-            site_packages = None
-            lib64_site_packages = None
+            lib_dir = 'lib/python*/site-packages'
+            lib64_dir = 'lib64/python*/site-packages'
+
             if sys.platform == 'win32' or sys.platform == 'cygwin':
-                lib64_site_packages = 'lib64\\site-packages'
-                site_packages = 'lib\\site-packages'
+                lib_dir = 'lib\\site-packages'
+                lib64_dir = 'lib64\\site-packages'
+
+            # Look for the site packages
+            lib_site_list = glob.glob(os.path.join(
+                self._pkg_venv, lib_dir))
+            if lib_site_list:
+                utils.copy_tree(lib_site_list[0], package)
             else:
-                # Look for the site packages
-                lib_site_list = glob.glob(os.path.join(
-                    self._pkg_venv, 'lib/python*/site-packages'))
-                if lib_site_list:
-                    site_packages = lib_site_list[0]
-                else:
-                    LOG.debug("no lib site packages found")
+                LOG.debug("no lib site packages found")
 
-                lib64_site_list = glob.glob(os.path.join(
-                    self._pkg_venv, 'lib64/python*/site-packages'))
-                if lib64_site_list:
-                    lib64_site_packages = lib64_site_list[0]
-                else:
-                    LOG.debug("no lib64 site packages found")
-
-            if site_packages:
-                utils.copy_tree(os.path.join(self._pkg_venv, site_packages),
-                                package)
-            if lib64_site_packages:
-                lib64_path = os.path.join(self._pkg_venv, lib64_site_packages)
-                if not os.path.islink(lib64_path):
+            lib64_site_list = glob.glob(os.path.join(
+                self._pkg_venv, lib64_dir))
+            if lib64_site_list:
+                lib64_site_packages = lib64_site_list[0]
+                if not os.path.islink(lib64_site_packages):
                     LOG.info('Copying lib64 site packages')
-                    utils.copy_tree(lib64_path, package)
+                    utils.copy_tree(lib64_site_packages, package)
+                lib64_site_packages = lib64_site_list[0]
+            else:
+                LOG.debug("no lib64 site packages found")
 
         # Append the temp workspace to the ignore list:
         ignore.append(r"^%s/.*" % re.escape(TEMP_WORKSPACE_NAME))
