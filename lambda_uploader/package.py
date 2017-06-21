@@ -254,13 +254,11 @@ class Package(object):
                     LOG.debug("no lib64 site packages found")
 
             if site_packages:
-                utils.copy_tree(os.path.join(self._pkg_venv, site_packages),
-                                package)
+                utils.copy_tree(site_packages, package)
             if lib64_site_packages:
-                lib64_path = os.path.join(self._pkg_venv, lib64_site_packages)
-                if not os.path.islink(lib64_path):
+                if not os.path.islink(lib64_site_packages):
                     LOG.info('Copying lib64 site packages')
-                    utils.copy_tree(lib64_path, package)
+                    utils.copy_tree(lib64_site_packages, package)
 
         # Append the temp workspace to the ignore list:
         ignore.append(r"^%s/.*" % re.escape(TEMP_WORKSPACE_NAME))
