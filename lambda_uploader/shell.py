@@ -81,7 +81,8 @@ def _execute(args):
         if args.extra_files:
             extra_files = args.extra_files
         pkg = package.build_package(pth, requirements,
-                                    venv, cfg.ignore, extra_files)
+                                    venv, cfg.ignore, extra_files,
+                                    pyexec=cfg.runtime)
 
     if not args.no_clean:
         pkg.clean_workspace()
