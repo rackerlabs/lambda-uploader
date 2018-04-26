@@ -135,7 +135,7 @@ class PackageUploader(object):
             get_resp = self._lambda_client.get_function_configuration(
                     FunctionName=self._config.name)
             LOG.debug("AWS get_function_configuration response: %s" % get_resp)
-        except:
+        except:  # noqa: E722
             existing_function = False
             LOG.debug("function not found creating new function")
 

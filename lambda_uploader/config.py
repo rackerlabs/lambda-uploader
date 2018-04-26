@@ -160,7 +160,7 @@ class Config(object):
                     ts = ksub.get('starting_position_timestamp')
                     try:
                         datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
-                    except:
+                    except:  # noqa: E722
                         raise TypeError("Starting position timestamp"
                                         " must have format "
                                         " YYYY-mm-ddTHH:MM:SSZ")

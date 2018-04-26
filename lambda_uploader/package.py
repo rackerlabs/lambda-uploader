@@ -37,9 +37,10 @@ ZIPFILE_NAME = 'lambda_function.zip'
 
 
 def build_package(path, requires, virtualenv=None, ignore=None,
-                  extra_files=None, zipfile_name=ZIPFILE_NAME):
+                  extra_files=None, zipfile_name=ZIPFILE_NAME,
+                  pyexec=None):
     '''Builds the zip file and creates the package with it'''
-    pkg = Package(path, zipfile_name)
+    pkg = Package(path, zipfile_name, pyexec)
 
     if extra_files:
         for fil in extra_files:
@@ -59,7 +60,7 @@ def create_package(path, zipfile_name=ZIPFILE_NAME):
 
 
 class Package(object):
-    def __init__(self, path, zipfile_name=ZIPFILE_NAME):
+    def __init__(self, path, zipfile_name=ZIPFILE_NAME, pyexec=None):
         self._path = path
         self._temp_workspace = os.path.join(path,
                                             TEMP_WORKSPACE_NAME)
@@ -68,6 +69,7 @@ class Package(object):
         self._virtualenv = None
         self._skip_virtualenv = False
         self._requirements = None
+        self._pyexec = pyexec
         self._requirements_file = os.path.join(self._path, "requirements.txt")
         self._extra_files = []
 
@@ -172,7 +174,9 @@ class Package(object):
             if sys.platform == 'win32' or sys.platform == 'cygwin':
                 self._venv_pip = 'Scripts\pip.exe'
 
-            proc = Popen(["virtualenv", "-p", _python_executable(),
+            python_exe = self._python_executable()
+
+            proc = Popen(["virtualenv", "-p", python_exe,
                           self._pkg_venv], stdout=PIPE, stderr=PIPE)
             stdout, stderr = proc.communicate()
             LOG.debug("Virtualenv stdout: %s" % stdout)
@@ -183,6 +187,22 @@ class Package(object):
 
         else:
             raise Exception('cannot build a new virtualenv when asked to omit')
+
+    def _python_executable(self):
+        if self._pyexec is not None:
+            python_exe = find_executable(self._pyexec)
+            if not python_exe:
+                raise Exception('Unable to locate {} executable'
+                                .format(self._pyexec))
+        else:
+            python_exe = find_executable('python2')
+            if not python_exe:
+                python_exe = find_executable('python')
+
+            if not python_exe:
+                raise Exception('Unable to locate python executable')
+
+        return python_exe
 
     def _install_requirements(self):
         '''
@@ -293,14 +313,3 @@ def _isfile(path):
     if not path:
         return False
     return os.path.isfile(path)
-
-
-def _python_executable():
-        python_exe = find_executable('python2')
-        if not python_exe:
-            python_exe = find_executable('python')
-
-        if not python_exe:
-            raise Exception('Unable to locate python executable')
-
-        return python_exe
