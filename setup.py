@@ -59,9 +59,14 @@ def package_meta():
 
 _lu_meta = package_meta()
 
+with open('README.md') as f:
+    long_description = f.read()
+
 setup(
     name='lambda-uploader',
     description='AWS Python Lambda Packager',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     keywords='aws lambda',
     version=_lu_meta['version'],
     extras_require=EXTRAS_REQUIRE,
