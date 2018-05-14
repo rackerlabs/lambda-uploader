@@ -1,6 +1,10 @@
 lambda-uploader CHANGELOG
 =========================
 
+1.2.1
+-----
+- Fix bad release version in pypi
+
 1.2.0
 -----
 - Added support for X-Ray tracing
