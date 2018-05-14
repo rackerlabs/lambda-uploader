@@ -1,9 +1,11 @@
 lambda-uploader CHANGELOG
 =========================
 
-1.2.1
+1.3.0
 -----
-- Fix bad release version in pypi
+- Add support for Python3 Virtual Environments
+- Fix copy source path
+- Allow specification of runtime in configuration file
 
 1.2.0
 -----
