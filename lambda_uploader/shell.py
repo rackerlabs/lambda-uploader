@@ -30,10 +30,10 @@ from botocore import __version__ as botocore_version
 LOG = logging.getLogger(__name__)
 
 NAMESPACE = 'rax_jira'
-CHECK = '\xe2\x9c\x85'
-INTERROBANG = '\xe2\x81\x89\xef\xb8\x8f'
-RED_X = '\xe2\x9d\x8c'
-LAMBDA = '\xce\xbb'
+CHECK = '✅'
+INTERROBANG = '‽'
+RED_X = '❌'
+LAMBDA = 'λ'
 TRACEBACK_MESSAGE = """%s Unexpected error. Please report this traceback.
 Uploader: %s
 Botocore: %s
