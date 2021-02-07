@@ -57,6 +57,9 @@ def _execute(args):
     cfg = config.Config(pth, args.config, role=args.role,
                         variables=args.variables)
 
+    if args.image_uri:
+        cfg.image_uri(args.image_uri)
+
     if args.s3_bucket:
         cfg.set_s3(args.s3_bucket, args.s3_key)
 
@@ -70,22 +73,25 @@ def _execute(args):
         # build and include virtualenv, the default
         venv = None
 
-    if args.no_build:
-        pkg = package.create_package(pth)
-    else:
-        _print('Building Package')
-        requirements = cfg.requirements
-        if args.requirements:
-            requirements = path.abspath(args.requirements)
-        extra_files = cfg.extra_files
-        if args.extra_files:
-            extra_files = args.extra_files
-        pkg = package.build_package(pth, requirements,
-                                    venv, cfg.ignore, extra_files,
-                                    pyexec=cfg.runtime)
+    if not cfg.image_uri:
+        if args.no_build:
+            pkg = package.create_package(pth)
+        else:
+            _print('Building Package')
+            requirements = cfg.requirements
+            if args.requirements:
+                requirements = path.abspath(args.requirements)
+            extra_files = cfg.extra_files
+            if args.extra_files:
+                extra_files = args.extra_files
+            pkg = package.build_package(pth, requirements,
+                                        venv, cfg.ignore, extra_files,
+                                        pyexec=cfg.runtime)
 
-    if not args.no_clean:
-        pkg.clean_workspace()
+        if not args.no_clean:
+            pkg.clean_workspace()
+    else:
+        pkg = None
 
     if not args.no_upload:
         # Set publish if flagged to do so
@@ -109,7 +115,8 @@ def _execute(args):
             _print('Creating subscription')
             subscribers.create_subscriptions(cfg, args.profile)
 
-        pkg.clean_zipfile()
+        if pkg:
+            pkg.clean_zipfile()
 
     _print('Fin')
 
@@ -164,6 +171,9 @@ def main(arv=None):
                         default=None, help=alias_help)
     parser.add_argument('--alias-description', '-m', dest='alias_description',
                         default=None, help='alias description')
+    parser.add_argument('--image-uri', '-i', dest='image_uri',
+                        help='uri of a container image in the amazon ecr registry to deploy',
+                        default=None)
     parser.add_argument('--s3-bucket', '-s', dest='s3_bucket',
                         help='S3 bucket to store the lambda function in',
                         default=None)
