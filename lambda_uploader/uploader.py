@@ -61,6 +61,11 @@ class PackageUploader(object):
             )
         LOG.debug("AWS update_function_code response: %s"
                   % conf_update_resp)
+
+        waiter = self._lambda_client.get_waiter('function_updated')
+        LOG.debug("Waiting for lambda function to be updated")
+        waiter.wait(FunctionName=self._config.name)
+
         LOG.debug('running update_function_configuration')
         response = self._lambda_client.update_function_configuration(
             FunctionName=self._config.name,
