@@ -85,6 +85,11 @@ class PackageUploader(object):
         version = response.get('Version')
         # Publish the version after upload and config update if needed
         if self._config.publish:
+
+            waiter = self._lambda_client.get_waiter('function_updated')
+            LOG.debug("Waiting for lambda function to be updated")
+            waiter.wait(FunctionName=self._config.name)
+
             resp = self._lambda_client.publish_version(
                     FunctionName=self._config.name,
                     )
