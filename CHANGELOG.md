@@ -1,6 +1,10 @@
 lambda-uploader CHANGELOG
 =========================
 
+1.3.1
+-----
+- Fix race condition during upload and publish
+
 1.3.0
 -----
 - Add support for Python3 Virtual Environments
