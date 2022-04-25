@@ -37,6 +37,8 @@ DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u's3_bucket': None, u's3_key': None, u'runtime': 'python2.7',
                   u'variables': {}, u'subscription': {}, u'tracing': {}}
 
+LAMBDA_JSON = 'lambda.json'
+
 
 class Config(object):
     def __init__(self, pth, config_file=None, role=None, variables=None):
@@ -186,13 +188,16 @@ class Config(object):
             raise Exception("%s not a valid function directory" % self._path)
 
         if not lambda_file:
-            lambda_file = path.join(self._path, 'lambda.json')
+            lambda_file = path.join(self._path, LAMBDA_JSON)
 
         if not path.isfile(lambda_file):
             raise Exception("%s not a valid configuration file" % lambda_file)
 
         with open(lambda_file) as config_file:
-            self._config = json.load(config_file)
+            try:
+                self._config = json.load(config_file)
+            except json.decoder.JSONDecodeError:
+                raise Exception("%s not a valid json file" % LAMBDA_JSON)
 
     def __getattr__(self, key):
         if key in self._config:
