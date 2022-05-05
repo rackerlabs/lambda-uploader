@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-from os import path
-
 import backoff
 import boto3
+import logging
 from botocore.exceptions import ClientError
+
+from os import path
 
 LOG = logging.getLogger(__name__)
 MAX_PACKAGE_SIZE = 50000000
@@ -37,7 +37,6 @@ class PackageUploader(object):
     '''
     Calls the AWS methods to upload an existing package and update
     the function configuration
-
     returns the package version
     '''
 
@@ -72,6 +71,10 @@ class PackageUploader(object):
             )
         LOG.debug("AWS update_function_code response: %s"
                   % conf_update_resp)
+
+        waiter = self._lambda_client.get_waiter('function_updated')
+        LOG.debug("Waiting for lambda function to be updated")
+        waiter.wait(FunctionName=self._config.name)
 
         @backoff.on_exception(backoff.expo, ClientError)
         def update_config():
@@ -108,7 +111,12 @@ class PackageUploader(object):
 
         @backoff.on_exception(backoff.expo, ClientError)
         def publish():
-            # Publish the version config and upload update if needed
+            # Publish the version after upload and config update if needed
+            waiter = self._lambda_client.get_waiter(
+                'function_updated')
+            LOG.debug("Waiting for lambda function to be updated")
+            waiter.wait(FunctionName=self._config.name)
+
             resp = self._lambda_client.publish_version(
                 FunctionName=self._config.name,
             )
@@ -122,7 +130,6 @@ class PackageUploader(object):
 
     '''
     Creates and uploads a new lambda function
-
     returns the package version
     '''
 
@@ -141,7 +148,6 @@ class PackageUploader(object):
                 code = {'ZipFile': zip_file}
         else:
             code = {'ImageUri': self._config.image_uri}
-
         LOG.debug('running create_function_code')
         if pkg:
             response = self._lambda_client.create_function(
