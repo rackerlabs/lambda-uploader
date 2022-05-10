@@ -8,6 +8,7 @@ INSTALL_REQUIRES = [
     'boto3>=1.4.2',
     'botocore>=1.4.85',
     'virtualenv',
+    'backoff'
 ]
 
 STYLE_REQUIRES = [

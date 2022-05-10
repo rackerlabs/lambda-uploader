@@ -35,7 +35,7 @@ DEFAULT_PARAMS = {u'requirements': [], u'publish': False,
                   u'alias': None, u'alias_description': None,
                   u'ignore': [], u'extra_files': [], u'vpc': None,
                   u's3_bucket': None, u's3_key': None, u'runtime': 'python2.7',
-                  u'variables': {}, u'subscription': {}, u'tracing': {}}
+                  u'variables': {}, u'subscription': {}, u'tracing': {}, u'image_uri': None}
 
 
 class Config(object):
@@ -78,6 +78,12 @@ class Config(object):
             return self._config['description']
         else:
             return self._config['alias_description']
+
+    '''
+    Public method to set image uri
+    '''
+    def set_image_uri(self, image_uri):
+        self._config['image_uri'] = image_uri
 
     '''
     Public method to set the S3 bucket and keyname
